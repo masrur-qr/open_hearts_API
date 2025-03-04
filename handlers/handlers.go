@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	controlers "docs/app"
+	"docs/app/controlers"
 
 	"github.com/gin-gonic/gin"
 )
