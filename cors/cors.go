@@ -1,4 +1,4 @@
-package controlers
+package cors
 
 import "github.com/gin-gonic/gin"
 

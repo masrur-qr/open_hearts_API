@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"docs/app/controlers"
-
+	"docs/app/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Handlers() {
 	r := gin.Default()
-	r.Use(controlers.Cors)
+	r.Use(cors.Cors)
 }
 
 
