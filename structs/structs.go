@@ -6,17 +6,18 @@ import (
 
 type EnglishUser struct{
 	Name       string
-	Surname    string
+
 }
 type RussianUser struct{
 	Name       string
-	Surname    string
+
 }
 
 
 type UserStruct struct {
 	jwt.StandardClaims
 	Id         string `bson:"_id"`
+	Photo string `json:"photo"`
 	Ru RussianUser `json:"ru"`
 	En EnglishUser `json:"en"`
 	Email      string `json:"email"`
@@ -72,7 +73,7 @@ type LangForProjectStatistic struct{
 	Name string `json:"name"`
 }
 
-type AddStatisticForProject struct{
+type AddStatisticForCenter struct{
 	 Id	string `bson:"_id"`
 	 Quantity	int `json:"quantity"`
 	 Ru LangForProjectStatistic `json:"ru"`
@@ -94,14 +95,14 @@ type ChangNumber struct{
 
 
 type LangForPatient struct{
-	Name string `json:"name"`
-	Surname string `json:"surname"`
-	Information string `json:"information"`
-	Citata string `json:"citata"`
+	Full_Name string `json:"full_name"`
+	Description string `json:"description"`
+	Quot string `json:"quot"`
 }
 type Patient_story struct{
 	Id string `bson:"_id"`
-	Photo string
+	Photo string  `json:"photo"`
+	Smallphoto string  `json:"smallphoto"`
 	En LangForPatient `json:"en"`
 	Ru LangForPatient`json:"ru"`
 }
@@ -215,23 +216,15 @@ type Time_For_Team struct{
 
 type LangForTeam struct{
 	Full_Name string `json:"full_name"`
-	Profession string `json:"profession"`
-	Education string  `json:"education"`
-	Specialization string `json:"specialization"`
-	Additional_information [] string `json:"additional_information"`
-	About_Specialist string `json:"about_specialist"`
+	Job_Title string `json:"job_title"`
+	Education [] string `json:"education"`
 	Expirence [] string `json:"expirence"`
-	Services [] string `json:"services"`
-	
 }
 
 
 
 type Team struct{
 	Id string `bson:"_id"`
-	Time Time_For_Team `json:"time"`
-	Phone string `json:"phone"`
-	Gmail string `json:"gmail"`
 	Ru LangForTeam `json:"ru"`
 	En LangForTeam `json:"en"`
 	Photo string  `json:"photo"`
@@ -244,7 +237,16 @@ type DeleteTeam struct{
 }
 
 
-
+type Services struct{
+	Id string `bson:"_id"`
+	Photo string `json:"photo"`
+	Ru ServiceLang  `json:"ru"`
+	En ServiceLang  `json:"en"`
+}
+type ServiceLang struct{
+	Name string `json:"name"`
+	Description string `json:"description"`
+}
 
 
 
