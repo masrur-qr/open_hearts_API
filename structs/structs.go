@@ -15,7 +15,7 @@ type RussianUser struct{
 
 
 type UserStruct struct {
-	jwt.StandardClaims
+
 	Id         string `bson:"_id"`
 	Photo string `json:"photo"`
 	Ru RussianUser `json:"ru"`

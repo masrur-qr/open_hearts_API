@@ -11,10 +11,12 @@ import (
 func Handlers() {
 	r := gin.Default()
 	r.Use(cors.Cors)
-
+	createadmin.Createadmin()
 	r.POST("/login",controlers.Login)
 	r.POST("/updateAdmin",createadmin.UpdateAdmin)
 
+
+	r.Run(":2020")
 }
 
 

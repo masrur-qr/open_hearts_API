@@ -63,6 +63,7 @@ func UpdateAdmin(c *gin.Context) {
 		if SecretKeyData.Permission != "Admin" && isvalid {
 			c.JSON(404, "error")
 		} else {
+			ids := c.Request.URL.Query().Get("id")
 			var Update_Admin structs.UserStruct
 			c.ShouldBindJSON(&Update_Admin)
 			fmt.Printf("Update_statistic: %v\n", Update_Admin)
@@ -95,7 +96,7 @@ func UpdateAdmin(c *gin.Context) {
 					Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
 					_, err2 := Connections.UpdateOne(ctx,
 						bson.M{
-							"phone": Update_Admin.Phone,
+							"_id": ids,
 						},
 						bson.D{
 							{Key: "$set", Value: bson.M{
