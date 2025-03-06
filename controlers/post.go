@@ -7,7 +7,6 @@ import (
 	"docs/app/mongoconnect"
 	returnjwt "docs/app/returnJwt"
 	"docs/app/structs"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -18,9 +17,9 @@ import (
 func Login(c *gin.Context) {
 	var LoginTemp structs.UserStruct
 	c.ShouldBindJSON(&LoginTemp)
-	EmptyField, err := emptyfieldcheker.EmptyField(LoginTemp, "Photo", "Name", "Surname", "Email", "Id", "Permission", "Ru", "En", "Audience", "Issuer", "Subject")
+	EmptyField, err := emptyfieldcheker.EmptyField(LoginTemp, "Photo", "Name", "Surname", "Email", "Id", "Permission", "Ru", "En")
 	if EmptyField {
-		c.JSON(404, err)
+		c.JSON(400, err)
 	} else {
 		client, ctx := mongoconnect.DBConnection()
 
@@ -29,30 +28,26 @@ func Login(c *gin.Context) {
 		result := DBConnect.FindOne(ctx, bson.M{
 			"phone": LoginTemp.Phone,
 		})
-
 		var userdata structs.UserStruct
 		result.Decode(&userdata)
+
 		isValidPass := hashedpasswod.CompareHashPasswords(userdata.Password, LoginTemp.Password)
-		fmt.Println(isValidPass)
+
 		key := returnjwt.GenerateToken(userdata.Phone, userdata.Permission, userdata.Id)
-		if userdata.Phone == LoginTemp.Phone {
-			if isValidPass {
-				http.SetCookie(c.Writer, &http.Cookie{
-					Name:     env.Data_Name,
-					Value:    key,
-					Expires:  time.Now().Add(60 * time.Hour),
-					Domain:   "",
-					Path:     "/",
-					Secure:   false,
-					HttpOnly: false,
-					SameSite: http.SameSiteLaxMode,
-				})
-				c.JSON(200, "success")
-			} else {
-				c.JSON(404, "Not valid pass")
-			}
+		if userdata.Phone != "" && isValidPass {
+			http.SetCookie(c.Writer, &http.Cookie{
+				Name:     env.Data_Cockie,
+				Value:    key,
+				Expires:  time.Now().Add(60 * time.Hour),
+				Domain:   "",
+				Path:     "/",
+				Secure:   false,
+				HttpOnly: false,
+				SameSite: http.SameSiteLaxMode,
+			})
+			c.JSON(200, "success")
 		} else {
-			c.JSON(400, "Wrong phone")
+			c.JSON(401, "Access is blocked")
 		}
 	}
 

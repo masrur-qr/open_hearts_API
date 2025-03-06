@@ -4,11 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type EnglishUser struct{
-	Name       string
-
-}
-type RussianUser struct{
+type LangForUser struct{
 	Name       string
 
 }
@@ -18,8 +14,8 @@ type UserStruct struct {
 
 	Id         string `bson:"_id"`
 	Photo string `json:"photo"`
-	Ru RussianUser `json:"ru"`
-	En EnglishUser `json:"en"`
+	Ru LangForUser `json:"ru"`
+	En LangForUser `json:"en"`
 	Email      string `json:"email"`
 	Phone      string `json:"phone"`
 	Password   string `json:"password"`
@@ -28,7 +24,7 @@ type UserStruct struct {
 
 type Verify struct {
 	Id   string `bson:"_id"`
-	Code  int `json:"code"`
+	Code  uint64 `json:"code"`
 	Email string `json:"email"`
 	User_Id string `json:"user_id"`
 }

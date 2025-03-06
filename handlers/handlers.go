@@ -14,6 +14,8 @@ func Handlers() {
 	createadmin.Createadmin()
 	r.POST("/login",controlers.Login)
 	r.POST("/updateAdmin",createadmin.UpdateAdmin)
+	r.POST("/addAdmin",createadmin.AdminRegistration)
+
 
 
 	r.Run(":2020")
