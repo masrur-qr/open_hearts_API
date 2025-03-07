@@ -15,6 +15,7 @@ func Handlers() {
 	r.POST("/login",controlers.Login)
 	r.POST("/updateAdmin",createadmin.UpdateAdmin)
 	r.POST("/addAdmin",createadmin.AdminRegistration)
+	r.POST("/add_statistic",controlers.AddStatistic)
 
 
 

@@ -6,6 +6,7 @@ import (
 
 	env "docs/app/Env"
 	"docs/app/baner"
+	"docs/app/createimagephoto"
 	"docs/app/emptyfieldcheker"
 	"docs/app/hashedpasswod"
 	"docs/app/mongoconnect"
@@ -57,7 +58,7 @@ func AdminRegistration(c *gin.Context) {
 		c.JSON(401, "error Not Cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "MainAdmin"  && isvalid {
+		if SecretKeyData.Permission != "MainAdmin" && isvalid {
 			c.JSON(403, "error")
 		} else {
 			var AdminData structs.UserStruct
@@ -67,20 +68,15 @@ func AdminRegistration(c *gin.Context) {
 				c.JSON(400, err)
 			} else {
 				folderName := "AdminPhoto"
-				err := os.Mkdir("Statics"+"/"+folderName, os.ModePerm)
-				if err != nil {
-					if os.IsExist(err) {
-						fmt.Println(" Папка уже существует.")
-					} else {
-						fmt.Println("Ошибка при создании папки")
-						return
-					}
-				} else {
-					fmt.Println("Папка успешно создана.")
+				FolderError := createimagephoto.CreateFolder(folderName)
+				if FolderError != nil {
+					fmt.Printf("FolderError: %v\n", FolderError)
 				}
 				rndName := rand.Intn(10000)
 				ForImage := fmt.Sprintf("image_%v.png", rndName)
+
 				AdminData.Photo = baner.ImageFunc(AdminData.Photo, ForImage, folderName)
+
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("Users")
 				ID := primitive.NewObjectID().Hex()
@@ -110,15 +106,6 @@ func AdminRegistration(c *gin.Context) {
 	}
 }
 
-
-
-
-
-
-
-
-
-
 func UpdateAdmin(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
@@ -134,67 +121,47 @@ func UpdateAdmin(c *gin.Context) {
 			if Emptyfield {
 				c.JSON(400, err)
 			} else {
-				client, ctx := mongoconnect.DBConnection()
-				Connections := client.Database(env.Data_Name).Collection("Users")
-				FindRezult := Connections.FindOne(ctx, bson.M{
-					"_id": Update_Admin.Id,
-				})
-				var Dbdata structs.UserStruct
-				FindRezult.Decode(&Dbdata)
-				if Dbdata.Id != "" {
-					if Dbdata.Photo != "" {
-						deleteeror := os.RemoveAll("./Statics/" + Dbdata.Photo)
-						if deleteeror != nil {
-							fmt.Printf("err: %v\n", deleteeror)
-						}
-					}
-
-					folder_Name := "AdminPhoto"
-					err := os.Mkdir("Statics"+"/"+folder_Name, os.ModePerm)
-					if err != nil {
-						if os.IsExist(err) {
-							fmt.Println(" Папка уже существует.")
-						} else {
-							fmt.Println("Ошибка при создании папки")
-							return
-						}
-					} else {
-						fmt.Println("Папка успешно создана.")
-					}
-					rndName := rand.Intn(10000)
-					ForImage := fmt.Sprintf("image_%v.png", rndName)
-					Update_Admin.Photo = baner.ImageFunc(Update_Admin.Photo, ForImage, folder_Name)
-
-					Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
-					_, err2 := Connections.UpdateOne(ctx,
-						bson.M{
-							"_id": Update_Admin.Id,
-						},
-						bson.D{
-							{Key: "$set", Value: bson.M{
-								"photo":    folder_Name + "/" + Update_Admin.Photo,
-								"phone":    Update_Admin.Phone,
-								"password": Hashed,
-								"email":    Update_Admin.Email,
-								"ru": structs.LangForUser{
-									Name: Update_Admin.Ru.Name,
-								},
-								"en": structs.LangForUser{
-									Name: Update_Admin.En.Name,
-								},
-							},
-							},
-						},
-					)
-					if err2 != nil {
-						fmt.Printf("err: %v\n", err)
-					}
-					c.JSON(200, "succes")
-				} else {
-					c.JSON(404, "User 88not founded")
+				folder_Name := "AdminPhoto"
+				FolderError := createimagephoto.CreateFolder(folder_Name)
+				if FolderError != nil {
+					fmt.Printf("FolderError: %v\n", FolderError)
 				}
+				rndName := rand.Intn(10000)
+				ForImage := fmt.Sprintf("image_%v.png", rndName)
+				Update_Admin.Photo = baner.ImageFunc(Update_Admin.Photo, ForImage, folder_Name)
+
+				client, ctx := mongoconnect.DBConnection()
+				collection := client.Database(env.Data_Name).Collection("Users")
+
+				Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
+				// Метод findAndUpdate: найти документ и обновить его
+				result := collection.FindOneAndUpdate(
+					ctx,
+					bson.D{
+						{"_id", Update_Admin.Id}, // Находим документ по ID
+					},
+					bson.D{
+						{"$set", bson.D{
+							{"email", Update_Admin.Email},
+							{"phone", Update_Admin.Phone},
+							{"photo", folder_Name + "/" + Update_Admin.Photo},
+							{"password", Hashed},
+							{"ru", Update_Admin.Ru.Name},
+							{"en", Update_Admin.En.Name},
+						}},
+					},
+				)
+				var Dbdata structs.UserStruct
+				result.Decode(&Dbdata)
+				if Dbdata.Photo != "" {
+					deleteeror := os.RemoveAll("./Statics/" + Dbdata.Photo)
+					if deleteeror != nil {
+						fmt.Printf("err: %v\n", deleteeror)
+					}
+				}
+
+				c.JSON(200, "succes")
 			}
 		}
 	}
-
 }
