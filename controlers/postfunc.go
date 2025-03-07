@@ -1,6 +1,7 @@
 package controlers
 
 import (
+	"context"
 	env "docs/app/Env"
 	"docs/app/baner"
 	"docs/app/createimagephoto"
@@ -163,7 +164,7 @@ func Add_statistic_for_project(c *gin.Context) {
 		c.JSON(404, "error Not Cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" &&isvalid {
 			c.JSON(404, "error:only admin have ecses to add")
 		} else {
 			var statistic_shablon structs.AddStatisticForCenter
@@ -196,8 +197,6 @@ func Add_statistic_for_project(c *gin.Context) {
 		}
 	}
 }
-
-
 
 
 func AddTeamMambers(c *gin.Context) {
@@ -245,14 +244,13 @@ func AddTeamMambers(c *gin.Context) {
 	}
 }
 
-
 func AddServices(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 		c.JSON(404, "error Not Cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
+		if SecretKeyData.Permission != "Admin" &&SecretKeyData.Permission != "MainAdmin" && isvalid {
 			c.JSON(404, "error")
 		} else {
 
@@ -290,15 +288,13 @@ func AddServices(c *gin.Context) {
 	}
 }
 
-
-
 func AddProgram(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 		c.JSON(404, "error Not Cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
 			c.JSON(404, "error")
 		} else {
 
@@ -324,15 +320,40 @@ func AddProgram(c *gin.Context) {
 				var createDB = client.Database(env.Data_Name).Collection("programs")
 				fmt.Printf("Patient_data: %v\n", Services)
 				Services.Id= primitive.NewObjectID().Hex()
-				insertrezult, inserterror := createDB.InsertOne(ctx,Services)
+				_, inserterror := createDB.InsertOne(ctx,Services)
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
 					c.JSON(200, "succes")
-					fmt.Printf("insertrezult: %v\n", insertrezult)
+	
 				}
 			}
 		}
 
+	}
+}
+
+
+func AddStatisticForCenter()  {
+	client, ctx := mongoconnect.DBConnection()
+	Connections := client.Database(env.Data_Name).Collection("center_statistic")
+	// if admin exist not insert
+	found := Connections.FindOne(ctx, bson.M{
+		"permission": "MainAdmin",
+	})
+	var shablon structs.UserStruct
+	found.Decode(&shablon)
+
+	if shablon.Permission == "MainAdmin" {
+		fmt.Println("MainAdmin is exsist")
+	} else {
+		for i := 0; i < 3; i++ {
+			
+			ID := primitive.NewObjectID().Hex()
+			Connections.InsertOne(context.Background(), structs.ChangNumber{
+				Id:ID,
+				Quantity:0,
+			})
+		}
 	}
 }
