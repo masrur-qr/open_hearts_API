@@ -16,7 +16,7 @@ func Handlers() {
 	r.POST("/updateAdmin",createadmin.UpdateAdmin)
 	r.POST("/addAdmin",createadmin.AdminRegistration)
 	r.POST("/add_statistic",controlers.AddStatistic)
-
+	r.POST("/add_pationt_story",controlers.AddPatientStory)
 
 
 	r.Run(":2020")

@@ -92,7 +92,7 @@ type ChangNumber struct{
 
 type LangForPatient struct{
 	Full_Name string `json:"full_name"`
-	Description string `json:"description"`
+	Description []string `json:"description"`
 	Quot string `json:"quot"`
 }
 type Patient_story struct{
