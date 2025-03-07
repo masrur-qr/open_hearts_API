@@ -9,7 +9,6 @@ import (
 	"docs/app/mongoconnect"
 	"docs/app/returnJwt"
 	"docs/app/structs"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
