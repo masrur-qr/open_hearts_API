@@ -213,8 +213,9 @@ type Time_For_Team struct{
 type LangForTeam struct{
 	Full_Name string `json:"full_name"`
 	Job_Title string `json:"job_title"`
-	Education [] string `json:"education"`
-	Expirence [] string `json:"expirence"`
+	Education string `json:"education"`
+	Expirence string `json:"expirence"`
+	Place string `json:"place"`
 }
 
 
