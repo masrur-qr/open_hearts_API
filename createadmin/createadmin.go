@@ -79,20 +79,18 @@ func AdminRegistration(c *gin.Context) {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("Users")
-				ID := primitive.NewObjectID().Hex()
+				AdminData.Id = primitive.NewObjectID().Hex()
 				Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
-				_, inserterror := createDB.InsertOne(ctx, bson.M{
-
-					"_id":        ID,
-					"photo":      folderName + "/" + AdminData.Photo,
-					"phone":      AdminData.Phone,
-					"password":   Hashed,
-					"permission": "Admin",
-					"email":      AdminData.Email,
-					"ru": structs.LangForUser{
+				_, inserterror := createDB.InsertOne(ctx, structs.UserStruct{
+					Id:         AdminData.Id,
+					Phone:      AdminData.Phone,
+					Password:   Hashed,
+					Permission: "Admin",
+					Email:      AdminData.Email,
+					Ru: structs.LangForUser{
 						Name: AdminData.Ru.Name,
 					},
-					"en": structs.LangForUser{
+					En: structs.LangForUser{
 						Name: AdminData.En.Name,
 					},
 				})
@@ -134,20 +132,19 @@ func UpdateAdmin(c *gin.Context) {
 				collection := client.Database(env.Data_Name).Collection("Users")
 
 				Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
-				// Метод findAndUpdate: найти документ и обновить его
 				result := collection.FindOneAndUpdate(
 					ctx,
 					bson.D{
-						{"_id", Update_Admin.Id}, // Находим документ по ID
+						{Key: "_id", Value: Update_Admin.Id},
 					},
 					bson.D{
-						{"$set", bson.D{
-							{"email", Update_Admin.Email},
-							{"phone", Update_Admin.Phone},
-							{"photo", folder_Name + "/" + Update_Admin.Photo},
-							{"password", Hashed},
-							{"ru", Update_Admin.Ru.Name},
-							{"en", Update_Admin.En.Name},
+						{Key:"$set", Value:bson.D{
+							{Key: "email", Value: Update_Admin.Email},
+							{Key: "phone", Value: Update_Admin.Phone},
+							{Key: "photo", Value: folder_Name + "/" + Update_Admin.Photo},
+							{Key: "password", Value: Hashed},
+							{Key: "ru", Value: Update_Admin.Ru.Name},
+							{Key: "en", Value: Update_Admin.En.Name},
 						}},
 					},
 				)

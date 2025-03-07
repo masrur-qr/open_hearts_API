@@ -38,14 +38,14 @@ func AddStatistic(c *gin.Context) {
 					c.JSON(404, err)
 				} else {
 
-					ID := primitive.NewObjectID().Hex()
-					_, inserterror := createDB.InsertOne(ctx, bson.M{
-						"_id":      ID,
-						"Quantity": statistic_shablon.Quantity,
-						"ru": structs.LangForStatistic{
+					statistic_shablon.Id= primitive.NewObjectID().Hex()
+					_, inserterror := createDB.InsertOne(ctx, structs.AddStatistic{
+						Id:      statistic_shablon.Id,
+						Quantity: statistic_shablon.Quantity,
+						Ru: structs.LangForStatistic{
 							Description: statistic_shablon.Ru.Description,
 						},
-						"en": structs.LangForStatistic{
+						En:  structs.LangForStatistic{
 							Description: statistic_shablon.En.Description,
 						},
 					})
