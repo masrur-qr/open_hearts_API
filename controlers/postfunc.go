@@ -244,7 +244,7 @@ func AddTeamMambers(c *gin.Context) {
 	}
 }
 
-func AddServices(c *gin.Context) {
+func AddProgram(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 		c.JSON(404, "error Not Cookie found")
@@ -254,53 +254,9 @@ func AddServices(c *gin.Context) {
 			c.JSON(404, "error")
 		} else {
 
-			var Services structs.Services
+			var Services structs.Program
 			c.ShouldBindJSON(&Services)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id")
-
-			if Emptyfield {
-					c.JSON(404, err)
-				} else {
-				folderName := "Servisec"
-
-				FolderError:= createimagephoto.CreateFolder(folderName)
-				if FolderError!= nil{
-					fmt.Printf("FolderError: %v\n", FolderError)
-				}
-				rndName := rand.Intn(10000)
-				ForImage := fmt.Sprintf("image_%v.png", rndName)
-				Photo := baner.ImageFunc(Services.Photo, ForImage, folderName)
-				Services.Photo=folderName+"/"+Photo
-				client, ctx := mongoconnect.DBConnection()
-
-				var createDB = client.Database(env.Data_Name).Collection("services")
-				Services.Id = primitive.NewObjectID().Hex()
-				insertrezult, inserterror := createDB.InsertOne(ctx, Services)
-				if inserterror != nil {
-					fmt.Printf("inserterror: %v\n", inserterror)
-				} else {
-					c.JSON(200, "succes")
-					fmt.Printf("insertrezult: %v\n", insertrezult)
-				}
-			}
-		}
-
-	}
-}
-
-func AddProgram(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
-	if cookieerror != nil {
-		c.JSON(404, "error Not Cookie found")
-	} else {
-		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
-			c.JSON(404, "error")
-		} else {
-
-			var Services structs.Services
-			c.ShouldBindJSON(&Services)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id")
+			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id","Servisec","LastDescription")
 
 			if Emptyfield {
 					c.JSON(404, err)
@@ -318,6 +274,50 @@ func AddProgram(c *gin.Context) {
 				client, ctx := mongoconnect.DBConnection()
 
 				var createDB = client.Database(env.Data_Name).Collection("programs")
+				Services.Id = primitive.NewObjectID().Hex()
+				insertrezult, inserterror := createDB.InsertOne(ctx, Services)
+				if inserterror != nil {
+					fmt.Printf("inserterror: %v\n", inserterror)
+				} else {
+					c.JSON(200, "succes")
+					fmt.Printf("insertrezult: %v\n", insertrezult)
+				}
+			}
+		}
+
+	}
+}
+
+func AddServices(c *gin.Context) {
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
+	if cookieerror != nil {
+		c.JSON(404, "error Not Cookie found")
+	} else {
+		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "error")
+		} else {
+
+			var Services structs.Services
+			c.ShouldBindJSON(&Services)
+			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id")
+
+			if Emptyfield {
+					c.JSON(404, err)
+				} else {
+				folderName := "servisec"
+
+				FolderError:= createimagephoto.CreateFolder(folderName)
+				if FolderError!= nil{
+					fmt.Printf("FolderError: %v\n", FolderError)
+				}
+				rndName := rand.Intn(10000)
+				ForImage := fmt.Sprintf("image_%v.png", rndName)
+				Photo := baner.ImageFunc(Services.Photo, ForImage, folderName)
+				Services.Photo=folderName+"/"+Photo
+				client, ctx := mongoconnect.DBConnection()
+
+				var createDB = client.Database(env.Data_Name).Collection("servisec")
 				fmt.Printf("Patient_data: %v\n", Services)
 				Services.Id= primitive.NewObjectID().Hex()
 				_, inserterror := createDB.InsertOne(ctx,Services)

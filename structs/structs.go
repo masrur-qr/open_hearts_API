@@ -234,6 +234,18 @@ type DeleteTeam struct{
 }
 
 
+type Program struct{
+	Id string `bson:"_id"`
+	Photo string `json:"photo"`
+	Ru ProgramLang  `json:"ru"`
+	En ProgramLang  `json:"en"`
+}
+type ProgramLang struct{
+	Title string `json:"title"`
+	Maindescription string `json:"maindescription"`
+	Servisec []string `json:"servisec"`
+	LastDescription string `json:"lastdescription"`
+}
 type Services struct{
 	Id string `bson:"_id"`
 	Photo string `json:"photo"`
@@ -241,8 +253,10 @@ type Services struct{
 	En ServiceLang  `json:"en"`
 }
 type ServiceLang struct{
-	Name string `json:"name"`
-	Description string `json:"description"`
+	Title string `json:"name"`
+	Maindescription string `json:"maindescription"`
+	Servisec []string `json:"servisec"`
+	LastDescription string `json:"lastdescription"`
 }
 
 

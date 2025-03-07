@@ -11,10 +11,12 @@ import (
 func Handlers() {
 	r := gin.Default()
 	r.Use(cors.Cors)
+
 	createadmin.Createadmin()
 	controlers.AddStatisticForCenter()
+
 	r.POST("/login",controlers.Login)
-	
+
 	r.POST("/addAdmin",createadmin.AdminRegistration)
 	r.POST("/add_statistic",controlers.AddStatistic)
 	r.POST("/add_pationt_story",controlers.AddPatientStory)
@@ -30,6 +32,10 @@ func Handlers() {
 	r.POST("/updateStatistic",controlers.UpdateStatistic)
 	r.POST("/updateProjectSataistic",controlers.UpdateProjectStatistic)
 	r.POST("/updateCenterSataistic",controlers.UpdateCenterStatistic)
+
+	
+
+
 	r.Run(":2020")
 }
 
