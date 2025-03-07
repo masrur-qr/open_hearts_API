@@ -17,23 +17,24 @@ func Handlers() {
 
 	r.POST("/login",controlers.Login)
 
-	r.POST("/addAdmin",createadmin.AdminRegistration)
-	r.POST("/add_statistic",controlers.AddStatistic)
-	r.POST("/add_pationt_story",controlers.AddPatientStory)
-	r.POST("/add_partner",controlers.AddPartner)
-	r.POST("/add_statistic_for_project",controlers.Add_statistic_for_project)
-	r.POST("/add_Team",controlers.AddTeamMambers)
-	r.POST("/add_servisec",controlers.AddServices)
-	r.POST("/add_program",controlers.AddProgram)
-	
-	
-	
-	r.POST("/updateAdmin",createadmin.UpdateAdmin)
-	r.POST("/updateStatistic",controlers.UpdateStatistic)
-	r.POST("/updateProjectSataistic",controlers.UpdateProjectStatistic)
-	r.POST("/updateCenterSataistic",controlers.UpdateCenterStatistic)
+	r.POST("/add/Admin",createadmin.AdminRegistration)
+	r.POST("/add/statistic",controlers.AddStatistic)
+	r.POST("/add/pationt/story",controlers.AddPatientStory)
 
+	r.POST("/add/partner",controlers.AddPartner)
+	r.POST("/add/statistic/for/project",controlers.Add_statistic_for_project)
+	r.POST("/add/team",controlers.AddTeamMambers)
+	r.POST("/add/servisec",controlers.AddServices)
+	r.POST("/add/program",controlers.AddProgram)
 	
+	
+	
+	r.POST("/update/Admin",createadmin.UpdateAdmin)
+	r.POST("/update/Statistic",controlers.UpdateStatistic)
+	r.POST("/update/Project/Sataistic",controlers.UpdateProjectStatistic)
+	r.POST("/update/Center/Sataistic",controlers.UpdateCenterStatistic)
+
+
 
 
 	r.Run(":2020")

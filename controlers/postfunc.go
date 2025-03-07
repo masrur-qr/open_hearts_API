@@ -27,7 +27,7 @@ func AddStatistic(c *gin.Context) {
 			c.JSON(404, "error:only admin have ecses to add")
 		} else {
 			client, ctx := mongoconnect.DBConnection()
-			createDB := client.Database(env.Data_Name).Collection("Statistic")
+			createDB := client.Database(env.Data_Name).Collection("statistic")
 			count, err := createDB.CountDocuments(ctx, bson.M{})
 			if err != nil {
 				fmt.Printf("err: %v\n", err)
@@ -56,7 +56,7 @@ func AddStatistic(c *gin.Context) {
 					if inserterror != nil {
 						fmt.Printf("inserterror: %v\n", inserterror)
 					} else {
-						c.JSON(201, "succes")
+						c.JSON(201, "success")
 					}
 				}
 			}
@@ -145,13 +145,13 @@ func AddPartner(c *gin.Context) {
 				PartnerData.Logo = folderName + "/" + Logo
 				client, ctx := mongoconnect.DBConnection()
 
-				var createDB = client.Database("OpenHearts").Collection("Partners")
+				var createDB = client.Database(env.Data_Name).Collection("partners")
 				PartnerData.Id = primitive.NewObjectID().Hex()
 				_, inserterror := createDB.InsertOne(ctx, PartnerData)
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 				}
 			}
 		}
@@ -189,7 +189,7 @@ func Add_statistic_for_project(c *gin.Context) {
 					if inserterror != nil {
 						fmt.Printf("inserterror: %v\n", inserterror)
 					} else {
-						c.JSON(201, "succes")
+						c.JSON(201, "success")
 					}
 				}
 			}
@@ -229,13 +229,13 @@ func AddTeamMambers(c *gin.Context) {
 				Photo := baner.ImageFunc(TeamData.Photo, ForImage, folderName)
 				client, ctx := mongoconnect.DBConnection()
 				TeamData.Photo=folderName+"/"+Photo
-				var createDB = client.Database(env.Data_Name).Collection("Team")
+				var createDB = client.Database(env.Data_Name).Collection("team")
 				TeamData.Id= primitive.NewObjectID().Hex()
 				insertrezult, inserterror := createDB.InsertOne(ctx,TeamData)
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 					fmt.Printf("insertrezult: %v\n", insertrezult)
 				}
 			}
@@ -279,7 +279,7 @@ func AddProgram(c *gin.Context) {
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 					fmt.Printf("insertrezult: %v\n", insertrezult)
 				}
 			}
@@ -324,7 +324,7 @@ func AddServices(c *gin.Context) {
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 	
 				}
 			}
@@ -332,7 +332,6 @@ func AddServices(c *gin.Context) {
 
 	}
 }
-
 
 func AddStatisticForCenter()  {
 	client, ctx := mongoconnect.DBConnection()

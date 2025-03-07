@@ -1,10 +1,8 @@
 package controlers
 
 import (
-	// "docs/app/baner"
 	env "docs/app/Env"
 	"docs/app/emptyfieldcheker"
-	// "docs/app/hashedpasswod"
 
 	"docs/app/mongoconnect"
 	"docs/app/returnJwt"
@@ -32,7 +30,7 @@ func UpdateStatistic(c *gin.Context) {
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
-				Connections := client.Database(env.Data_Name).Collection("Statistic")
+				Connections := client.Database(env.Data_Name).Collection("statistic")
 				result := Connections.FindOneAndUpdate(
 					ctx,
 					bson.D{
@@ -56,7 +54,7 @@ func UpdateStatistic(c *gin.Context) {
 				if Dbdata.Id == "" {
 					c.JSON(400, "statistic not founded")
 				} else {
-					c.JSON(200, "Succes")
+					c.JSON(200, "Success")
 				}
 
 			}
@@ -99,7 +97,7 @@ func UpdateCenterStatistic(c *gin.Context) {
 				if Dbdata.Id == "" {
 					c.JSON(400, "statistic not founded")
 				} else {
-					c.JSON(200, "Succes")
+					c.JSON(200, "Success")
 				}
 
 			}
@@ -148,7 +146,7 @@ func UpdateProjectStatistic(c *gin.Context) {
 				if Dbdata.Id == "" {
 					c.JSON(400, "statistic not founded")
 				} else {
-					c.JSON(200, "Succes")
+					c.JSON(200, "Success")
 				}
 			}
 		}
