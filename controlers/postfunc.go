@@ -101,7 +101,7 @@ func AddPatientStory(c *gin.Context) {
 				Patient_data.Smallphoto = folderName2 + "/" + Smallphoto
 
 				client, ctx := mongoconnect.DBConnection()
-				var createDB = client.Database(env.Data_Name).Collection("PatientStory")
+				var createDB = client.Database(env.Data_Name).Collection("patientstory")
 
 				Patient_data.Id = primitive.NewObjectID().Hex()
 

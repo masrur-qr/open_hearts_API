@@ -80,7 +80,7 @@ func UpdateCenterStatistic(c *gin.Context) {
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
-				Connections := client.Database(env.Data_Name).Collection("center_number")
+				Connections := client.Database(env.Data_Name).Collection("center_statistic")
 				result := Connections.FindOneAndUpdate(
 					ctx,
 					bson.D{
