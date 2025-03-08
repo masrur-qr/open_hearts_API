@@ -50,7 +50,7 @@ func DeletePatientStory(c *gin.Context) {
 					if err != nil && err2!=nil {
 						fmt.Printf("err: %v\n", err)
 					}
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 					fmt.Printf("deletrezult: %v\n", deletrezult)
 				} else {
 					c.JSON(404, "error")
@@ -91,7 +91,7 @@ func DeletePatners(c *gin.Context) {
 				if err != nil {
 					fmt.Printf("err: %v\n", err)
 				} else {
-					c.JSON(200, "succes")
+					c.JSON(200, "success")
 					fmt.Printf("deletrezult: %v\n", deletrezult)
 				}
 			} else {
@@ -137,7 +137,7 @@ func DeleteTeam(c *gin.Context) {
 					if err != nil {
 						fmt.Printf("err: %v\n", err)
 					} else {
-						c.JSON(200, "succes")
+						c.JSON(200, "success")
 					}
 				} else {
 					c.JSON(404, "error person not deleted")
@@ -179,7 +179,7 @@ func DeleteServisec(c *gin.Context) {
 					if err != nil {
 						fmt.Printf("err: %v\n", err)
 					} else {
-						c.JSON(200, "succes")
+						c.JSON(200, "success")
 					}
 				} else {
 					c.JSON(404, "error")
@@ -222,7 +222,7 @@ func DeleteProgram(c *gin.Context) {
 					if err != nil {
 						fmt.Printf("err: %v\n", err)
 					} else {
-						c.JSON(200, "succes")
+						c.JSON(200, "success")
 					}
 				} else {
 					c.JSON(404, "error")
@@ -262,7 +262,7 @@ func DeleteAdmin(c *gin.Context) {
 					if err != nil {
 						fmt.Printf("err: %v\n", err)
 					} else {
-						c.JSON(200, "succes")
+						c.JSON(200, "success")
 					}
 				} else {
 					c.JSON(404, "error")
