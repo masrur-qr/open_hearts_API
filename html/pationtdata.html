@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form id="form">
+        <label>Большое фото:</label>
+        <input type="file" id="bigPhoto"><br><br>
+
+        <label>Маленькое фото:</label>
+        <input type="file" id="smallPhoto"><br><br>
+
+        <input type="submit" value="Отправить">
+    </form>
+
+    <script>
+        const IpPort = "http://127.0.0.1:2020";
+
+        var form = document.getElementById("form");
+        const data = JSON.stringify({
+            "phone": "123",
+            "password": "Admin"
+        });
+
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === this.DONE) {
+                console.log(this.responseText);
+            }
+        });
+
+        xhr.open("POST", IpPort + "/login");
+        xhr.setRequestHeader("Accept", "*/*");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.send(data);
+
+        form.onsubmit = evt => {
+            evt.preventDefault();
+
+            var bigPhotoFile = document.getElementById("bigPhoto").files[0];
+            var smallPhotoFile = document.getElementById("smallPhoto").files[0];
+
+            if (!bigPhotoFile || !smallPhotoFile) {
+                console.error("Выберите оба файла!");
+                return;
+            }
+
+            var reader1 = new FileReader();
+            var reader2 = new FileReader();
+
+            reader1.onloadend = function () {
+                var bigPhotoBase64 = reader1.result.split(',')[1]; // Берем Base64
+
+                reader2.onloadend = function () {
+                    var smallPhotoBase64 = reader2.result.split(',')[1]; // Берем Base64
+
+                    const data = JSON.stringify({
+                        "Photo": bigPhotoBase64,
+                        "smallphoto": smallPhotoBase64,
+                        "ru": {
+                            "full_name": "Русскый",
+                            "description": ["vsdvsv"],
+                            "quot": "Описание"
+                        },
+                        "en": {
+                            "full_name": "Русскый",
+                            "description": ["vsdvsv"],
+                            "quot": "Описание"
+                        }
+                    });
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.withCredentials = true;
+
+                    xhr.addEventListener("readystatechange", function () {
+                        if (this.readyState === this.DONE) {
+                            console.log(this.responseText);
+                        }
+                    });
+
+                    xhr.open("POST", IpPort + "/add/pationt/story");
+                    xhr.setRequestHeader("Accept", "*/*");
+                    xhr.setRequestHeader("Content-Type", "application/json");
+
+                    xhr.send(data);
+                };
+
+                reader2.readAsDataURL(smallPhotoFile);
+            };
+
+            reader1.readAsDataURL(bigPhotoFile);
+        };
+    </script>
+</body>
+
+</html>

@@ -231,6 +231,46 @@ func DeleteProgram(c *gin.Context) {
 		}
 	}
 }
+func DeleteAdmin(c *gin.Context) {
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	if cookieerror != nil {
+		c.JSON(404, "error Not Cookie found")
+	} else {
+		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
+		if SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "error")
+		} else {
+
+			ids := c.Request.URL.Query().Get("id")
+			Path := c.Request.URL.Query().Get("Path")
+
+
+			if ids == "" && Path == "" {
+				c.JSON(404, "error empty field")
+			} else {
+
+				client, ctx := mongoconnect.DBConnection()
+				var createDB = client.Database(env.Data_Name).Collection("users")
+				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
+					"_id": ids,
+				})
+				if deleteerror != nil {
+					fmt.Printf("deleteerror: %v\n", deleteerror)
+				}
+				if deletrezult.DeletedCount == 1 {
+					err := os.RemoveAll("./Statics/" + Path)
+					if err != nil {
+						fmt.Printf("err: %v\n", err)
+					} else {
+						c.JSON(200, "succes")
+					}
+				} else {
+					c.JSON(404, "error")
+				}
+			}
+		}
+	}
+}
 
 
 

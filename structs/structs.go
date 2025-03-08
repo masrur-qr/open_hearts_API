@@ -20,6 +20,7 @@ type UserStruct struct {
 	Phone      string `json:"phone"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
+	Code uint64 `json:"code"`
 }
 
 type Verify struct {
@@ -242,9 +243,7 @@ type Program struct{
 }
 type ProgramLang struct{
 	Title string `json:"title"`
-	Maindescription string `json:"maindescription"`
-	Servisec []string `json:"servisec"`
-	LastDescription string `json:"lastdescription"`
+	Description string `json:"description"`
 }
 type Services struct{
 	Id string `bson:"_id"`

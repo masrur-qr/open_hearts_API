@@ -22,7 +22,7 @@ import (
 
 func Createadmin() {
 	client, ctx := mongoconnect.DBConnection()
-	Connections := client.Database(env.Data_Name).Collection("Users")
+	Connections := client.Database(env.Data_Name).Collection("users")
 	// if admin exist not insert
 	found := Connections.FindOne(ctx, bson.M{
 		"permission": "MainAdmin",
@@ -79,7 +79,7 @@ func AdminRegistration(c *gin.Context) {
 				AdminData.Photo=folderName+"/"+Photo
 
 				client, ctx := mongoconnect.DBConnection()
-				var createDB = client.Database(env.Data_Name).Collection("Users")
+				var createDB = client.Database(env.Data_Name).Collection("users")
 				AdminData.Id = primitive.NewObjectID().Hex()
 				Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
 				AdminData.Password=Hashed
@@ -119,7 +119,7 @@ func UpdateAdmin(c *gin.Context) {
 				Update_Admin.Photo = baner.ImageFunc(Update_Admin.Photo, ForImage, folder_Name)
 
 				client, ctx := mongoconnect.DBConnection()
-				collection := client.Database(env.Data_Name).Collection("Users")
+				collection := client.Database(env.Data_Name).Collection("users")
 
 				Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
 				result := collection.FindOneAndUpdate(

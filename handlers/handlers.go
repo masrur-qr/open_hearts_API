@@ -16,6 +16,12 @@ func Handlers() {
 	controlers.AddStatisticForCenter()
 
 	r.POST("/login",controlers.Login)
+	r.POST("/send/secrate/code",controlers.SendSecrateCode)
+	r.POST("/update/password",controlers.UpdateAdminPassword)
+
+
+
+
 
 	r.POST("/add/admin",createadmin.AdminRegistration)
 	r.POST("/add/statistic",controlers.AddStatistic)
@@ -26,7 +32,7 @@ func Handlers() {
 	r.POST("/add/servisec",controlers.AddServices)
 	r.POST("/add/program",controlers.AddProgram)
 	
-	
+
 	
 	r.POST("/update/admin",createadmin.UpdateAdmin)
 	r.POST("/update/statistic",controlers.UpdateStatistic)
@@ -39,6 +45,7 @@ func Handlers() {
 	r.DELETE("/delete/team",controlers.DeleteTeam)
 	r.DELETE("/delete/servisec",controlers.DeleteServisec)
 	r.DELETE("/delete/program",controlers.DeleteProgram)
+	r.DELETE("/delete/admin",controlers.DeleteAdmin)
 
 
 

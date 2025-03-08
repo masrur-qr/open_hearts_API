@@ -17,13 +17,13 @@ import (
 func Login(c *gin.Context) {
 	var LoginTemp structs.UserStruct
 	c.ShouldBindJSON(&LoginTemp)
-	EmptyField, err := emptyfieldcheker.EmptyField(LoginTemp, "Photo", "Name", "Surname", "Email", "Id", "Permission", "Ru", "En")
+	EmptyField, err := emptyfieldcheker.EmptyField(LoginTemp,"Code", "Photo", "Name", "Surname", "Email", "Id", "Permission", "Ru", "En")
 	if EmptyField {
 		c.JSON(400, err)
 	} else {
 		client, ctx := mongoconnect.DBConnection()
 
-		DBConnect := client.Database(env.Data_Name).Collection("Users")
+		DBConnect := client.Database(env.Data_Name).Collection("users")
 
 		result := DBConnect.FindOne(ctx, bson.M{
 			"phone": LoginTemp.Phone,
