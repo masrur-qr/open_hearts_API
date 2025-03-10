@@ -15,53 +15,60 @@ func Handlers() {
 	createadmin.Createadmin()
 	controlers.AddStatisticForCenter()
 
-	r.POST("/login",controlers.Login)
-	r.POST("/send/secrate/code",controlers.SendSecrateCode)
-	r.POST("/update/password",controlers.UpdateAdminPassword)
-
-
-
-
-
-	r.POST("/add/admin",createadmin.AdminRegistration)
-	r.POST("/add/statistic",controlers.AddStatistic)
-	r.POST("/add/statistic/for/project",controlers.Add_statistic_for_project)
-	r.POST("/add/pationt/story",controlers.AddPatientStory)
-	r.POST("/add/partner",controlers.AddPartner)
-	r.POST("/add/team",controlers.AddTeamMambers)
-	r.POST("/add/servisec",controlers.AddServices)
-	r.POST("/add/program",controlers.AddProgram)
+	r.POST("/login", controlers.Login)
+	r.POST("/send/secret/code", controlers.SendSecretCode) 
+	r.POST("/update/password", controlers.UpdateAdminPassword)
 	
 
-	
-	r.POST("/update/admin",createadmin.UpdateAdmin)
-	r.POST("/update/statistic",controlers.UpdateStatistic)
-	r.POST("/update/project/sataistic",controlers.UpdateProjectStatistic)
-	r.POST("/update/center/sataistic",controlers.UpdateCenterStatistic)
+	r.POST("/add/admin", createadmin.AdminRegistration)
+	r.POST("/update/admin", createadmin.UpdateAdmin)
+	r.DELETE("/delete/admin", controlers.DeleteAdmin)
+	r.GET("/get/admin", controlers.GetAdmins)
+
+
+	r.POST("/add/statistic", controlers.AddStatistic)
+	r.POST("/update/statistic", controlers.UpdateStatistic)
+	r.GET("/get/statistic", controlers.GetStatistics)
+
+
+	r.POST("/add/statistic/for/project", controlers.AddStatisticForProject) 
+	r.POST("/update/project/statistic", controlers.UpdateProjectStatistic) 
+	r.GET("/get/project/statistic", controlers.GetStatisticsForProject) 
+
+
+	r.POST("/add/patient/story", controlers.AddPatientStory) 
+	r.DELETE("/delete/patient/story", controlers.DeletePatientStory) 
+	r.GET("/get/patient/story", controlers.GetPatientStories) 
+
+
+
+	r.POST("/add/partner", controlers.AddPartner)
+	r.DELETE("/delete/partner", controlers.DeletePartners) 
+	r.GET("/get/partner", controlers.GetPartners) 
+
+
+	r.POST("/add/team", controlers.AddTeamMembers) 
+	r.DELETE("/delete/team", controlers.DeleteTeam)
+	r.GET("/get/team", controlers.GetTeam)
+
+
+	r.POST("/add/services", controlers.AddServices) 
+	r.DELETE("/delete/services", controlers.DeleteServices) 
+	r.GET("/get/services", controlers.GetServices)
 
 	
-	r.DELETE("/delete/pationt/story",controlers.DeletePatientStory)
-	r.DELETE("/delete/partner",controlers.DeletePatners)
-	r.DELETE("/delete/team",controlers.DeleteTeam)
-	r.DELETE("/delete/servisec",controlers.DeleteServisec)
-	r.DELETE("/delete/program",controlers.DeleteProgram)
-	r.DELETE("/delete/admin",controlers.DeleteAdmin)
-
-
-
-
+	r.POST("/add/program", controlers.AddProgram)
+	r.DELETE("/delete/program", controlers.DeleteProgram)
+	r.GET("/get/program", controlers.GetPrograms)
 	
-	r.GET("/get/statistic",controlers.GetStatistic)
-	r.GET("/get/pationt/story",controlers.GetPatientStory)
-	r.GET("/get/patner",controlers.GetPatners)
-	r.GET("/get/center",controlers.Get_center_number)
-	r.GET("/get/project/statistic",controlers.GetStatisticforproject)
-	r.GET("/get/team",controlers.GetTeam)
-	r.GET("/get/services",controlers.GetServices)
-	r.GET("/get/program",controlers.GetProgram)
 
-
+	r.POST("/update/center/statistic", controlers.UpdateCenterStatistic) 
+	r.GET("/get/center", controlers.GetCenterNumbers) 
+	
+	
+	
 	r.Run(":2020")
+
 }
 
 

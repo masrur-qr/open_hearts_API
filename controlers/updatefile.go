@@ -152,7 +152,3 @@ func UpdateProjectStatistic(c *gin.Context) {
 		}
 	}
 }
-
-
-
-// "ebnm dgus keae hhut"

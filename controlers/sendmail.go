@@ -23,7 +23,7 @@ func random(min, max int) int {
 	}
 	return rand.Intn(max-min+1) + min
 }
-func SendSecrateCode(c *gin.Context) {
+func SendSecretCode(c *gin.Context) {
 
 	GetEmail := c.Request.URL.Query().Get("email")
 

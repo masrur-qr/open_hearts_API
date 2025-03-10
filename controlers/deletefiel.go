@@ -4,6 +4,7 @@ import (
 	"docs/app/Env"
 	"docs/app/mongoconnect"
 	"docs/app/returnJwt"
+	"docs/app/structs"
 
 	"fmt"
 	"os"
@@ -12,177 +13,144 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-
-
 func DeletePatientStory(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
-		fmt.Printf("cookieerror: %v\n", cookieerror)
-		c.JSON(404, "error Not Cookie found")
-		fmt.Printf("cookidata: %v\n", cookidata)
+		c.JSON(404, "Error: No cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(404, "error")
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "Error: You are not an admin")
 		} else {
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
-			Path2 := c.Request.URL.Query().Get("SecondPath")
 
-			if ids == "" && Path == "" && Path2=="" {
-				c.JSON(404, "Empty Field")
+			if ids == "" {
+				c.JSON(404, "Empty field")
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("patientstory")
-				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-					"_id": ids,
-				})
-				if deleteerror != nil {
-					fmt.Printf("deleteerror: %v\n", deleteerror)
-				}
-				if deletrezult.DeletedCount == 1 {
-					err := os.RemoveAll("./Statics/" + Path)
-					if err != nil {
-						fmt.Printf("err: %v\n", err)
+				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+				var Delete structs.Patient_story
+				deleterezult.Decode(&Delete)
+				if Delete.Id != "" {
+					err := os.RemoveAll("./Statics/" + Delete.Photo)
+					err2 := os.RemoveAll("./Statics/" + Delete.Smallphoto)
+					if err != nil && err2 != nil {
+						fmt.Printf("Error: %v\n", err)
+					} else {
+						c.JSON(200, "Success")
 					}
-					err2 := os.RemoveAll("./Statics/" + Path2)
-					if err != nil && err2!=nil {
-						fmt.Printf("err: %v\n", err)
-					}
-					c.JSON(200, "success")
-					fmt.Printf("deletrezult: %v\n", deletrezult)
 				} else {
-					c.JSON(404, "error")
+					c.JSON(404, "Error: Not found")
 				}
 			}
 		}
 	}
 }
 
-
-
-
-
-func DeletePatners(c *gin.Context) {
+func DeletePartners(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
 	if cookieerror != nil {
-		fmt.Printf("cookieerror: %v\n", cookieerror)
-		c.JSON(404, "error Not Cookie found")
-		fmt.Printf("cookidata: %v\n", cookidata)
+
+		c.JSON(404, "Error: No cookie found")
+
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(404, "error")
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "Error: You are not an admin")
 		} else {
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
 
 			client, ctx := mongoconnect.DBConnection()
 			var createDB = client.Database(env.Data_Name).Collection("partners")
-			deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-				"_id": ids,
-			})
-			if deleteerror != nil {
-				fmt.Printf("deleteerror: %v\n", deleteerror)
-			}
-			if deletrezult.DeletedCount == 1 {
-				err := os.RemoveAll("./Statics/" + Path)
+			deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+			var Delete structs.Partner
+			deleterezult.Decode((Delete))
+			if Delete.Id != "" {
+				err := os.RemoveAll("./Statics/" + Delete.Logo)
 				if err != nil {
-					fmt.Printf("err: %v\n", err)
+					fmt.Printf("Error: %v\n", err)
 				} else {
-					c.JSON(200, "success")
-					fmt.Printf("deletrezult: %v\n", deletrezult)
+					c.JSON(200, "Success")
 				}
 			} else {
-				c.JSON(404, "error1")
+				c.JSON(404, "Error: Not found")
 			}
 		}
 	}
 }
-
-
-
 
 func DeleteTeam(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
 	if cookieerror != nil {
-		fmt.Printf("cookieerror: %v\n", cookieerror)
-		c.JSON(404, "error Not Cookie found")
-		fmt.Printf("cookidata: %v\n", cookidata)
+
+		c.JSON(404, "Error: No cookie found")
+
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(404, "error")
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "Error: You are not an admin")
 		} else {
 
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
 
-
-			if ids == "" && Path == "" {
-				c.JSON(404, "error empty field")
+			if ids == "" {
+				c.JSON(404, "Error: Empty field")
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("team")
-				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-					"_id": ids,
-				})
-				if deleteerror != nil {
-					fmt.Printf("deleteerror: %v\n", deleteerror)
-				}
-				if deletrezult.DeletedCount == 1 {
-					err := os.RemoveAll("./Statics/" + Path)
+				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+				var Delete structs.Team
+				deleterezult.Decode(Delete)
+				if Delete.Id != "" {
+					err := os.RemoveAll("./Statics/" + Delete.Photo)
 					if err != nil {
-						fmt.Printf("err: %v\n", err)
+						fmt.Printf("Error: %v\n", err)
 					} else {
-						c.JSON(200, "success")
+						c.JSON(200, "Success")
 					}
 				} else {
-					c.JSON(404, "error person not deleted")
+					c.JSON(404, "Error: Not found")
 				}
 			}
 		}
 	}
 }
-func DeleteServisec(c *gin.Context) {
+
+func DeleteServices(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
 	if cookieerror != nil {
-		fmt.Printf("cookieerror: %v\n", cookieerror)
-		c.JSON(404, "error Not Cookie found")
-		fmt.Printf("cookidata: %v\n", cookidata)
+
+		c.JSON(404, "Error: No cookie found")
+
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(404, "error")
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "Error: You are not an admin")
 		} else {
 
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
 
-
-			if ids == "" && Path == "" {
-				c.JSON(404, "error empty field")
+			if ids == "" {
+				c.JSON(404, "Error: Empty field")
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("services")
-				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-					"_id": ids,
-				})
-				if deleteerror != nil {
-					fmt.Printf("deleteerror: %v\n", deleteerror)
-				}
-				if deletrezult.DeletedCount == 1 {
-					err := os.RemoveAll("./Statics/" + Path)
+				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+				var Delete structs.UserStruct
+				deleterezult.Decode(&Delete)
+				if Delete.Id != "" {
+					err := os.RemoveAll("./Statics/" + Delete.Photo)
 					if err != nil {
-						fmt.Printf("err: %v\n", err)
+						fmt.Printf("Error: %v\n", err)
 					} else {
-						c.JSON(200, "success")
+						c.JSON(200, "Success")
 					}
 				} else {
-					c.JSON(404, "error")
+					c.JSON(404, "Error: Not found")
 				}
 			}
 		}
@@ -192,92 +160,73 @@ func DeleteServisec(c *gin.Context) {
 func DeleteProgram(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
 	if cookieerror != nil {
-		fmt.Printf("cookieerror: %v\n", cookieerror)
-		c.JSON(404, "error Not Cookie found")
-		fmt.Printf("cookidata: %v\n", cookidata)
+
+		c.JSON(404, "Error: No cookie found")
+
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(404, "error")
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
+			c.JSON(404, "Error: You are not an admin")
 		} else {
 
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
 
-
-			if ids == "" && Path == "" {
-				c.JSON(404, "error empty field")
+			if ids == "" {
+				c.JSON(404, "Error: Empty field")
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("programs")
-				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-					"_id": ids,
-				})
-				if deleteerror != nil {
-					fmt.Printf("deleteerror: %v\n", deleteerror)
-				}
-				if deletrezult.DeletedCount == 1 {
-					err := os.RemoveAll("./Statics/" + Path)
+				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+				var Delete structs.Program
+				deleterezult.Decode(&Delete)
+				if Delete.Id != "" {
+					err := os.RemoveAll("./Statics/" + Delete.Photo)
 					if err != nil {
-						fmt.Printf("err: %v\n", err)
+						fmt.Printf("Error: %v\n", err)
 					} else {
-						c.JSON(200, "success")
+						c.JSON(200, "Success")
 					}
 				} else {
-					c.JSON(404, "error")
+					c.JSON(404, "Error: Not found")
 				}
 			}
 		}
 	}
 }
+
 func DeleteAdmin(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
 	if cookieerror != nil {
-		c.JSON(404, "error Not Cookie found")
+		c.JSON(404, "Error: No cookie found")
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
 		if SecretKeyData.Permission != "MainAdmin" && isvalid {
-			c.JSON(404, "error")
+			c.JSON(404, "Error: You are not a Main Admin")
 		} else {
 
 			ids := c.Request.URL.Query().Get("id")
-			Path := c.Request.URL.Query().Get("Path")
 
-
-			if ids == "" && Path == "" {
-				c.JSON(404, "error empty field")
+			if ids == "" {
+				c.JSON(404, "Error: Empty field")
 			} else {
 
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("users")
-				deletrezult, deleteerror := createDB.DeleteOne(ctx, bson.M{
-					"_id": ids,
-				})
-				if deleteerror != nil {
-					fmt.Printf("deleteerror: %v\n", deleteerror)
-				}
-				if deletrezult.DeletedCount == 1 {
-					err := os.RemoveAll("./Statics/" + Path)
+				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
+				var Delete structs.UserStruct
+				deleterezult.Decode(&Delete)
+				if Delete.Id != "" {
+					err := os.RemoveAll("./Statics/" + Delete.Photo)
 					if err != nil {
-						fmt.Printf("err: %v\n", err)
+						fmt.Printf("Error: %v\n", err)
 					} else {
-						c.JSON(200, "success")
+						c.JSON(200, "Success")
 					}
 				} else {
-					c.JSON(404, "error")
+					c.JSON(404, "Error: Not found")
 				}
 			}
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
