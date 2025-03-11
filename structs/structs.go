@@ -20,6 +20,7 @@ type UserStruct struct {
 	Phone      string `json:"phone"`
 	Password   string `json:"password"`
 	Permission string `json:"permission"`
+	Code uint64 `json:"code"`
 }
 
 type Verify struct {
@@ -46,12 +47,6 @@ type Tokenclaim struct{
 
 
 
-
-
-
-
-
-
 type LangForStatistic struct{
 	Description	string `json:"description"`
 }
@@ -62,6 +57,8 @@ type AddStatistic struct{
 	 Ru LangForStatistic `json:"ru"`
 	 En LangForStatistic `json:"en"`
 }
+
+
 
 
 type LangForProjectStatistic struct{
@@ -86,13 +83,9 @@ type ChangNumber struct{
 
 
 
-
-
-
-
 type LangForPatient struct{
 	Full_Name string `json:"full_name"`
-	Description []string `json:"description"`
+	Description string `json:"description"`
 	Quot string `json:"quot"`
 }
 type Patient_story struct{
@@ -128,93 +121,12 @@ type DeletePartner struct{
 
 
 
-
-
-
-
-type RuDiract struct{
-	Title string `json:"title"`
-	Short_info string `json:"short_info"`
-}
-type EnDiract struct{
-	Title string `json:"title"`
-	Short_info string `json:"short_info"`
-} 
-type Diraction struct{
-	Id string `bson:"_id"`
-	Ru RuDiract `json:"ru"`
-	En EnDiract `json:"en"`
-}
-
-
-
-
-
-
-
-type LangForDiraction struct{
-	Title string `json:"title"`
-	Description string `json:"description"`
-	MainServices [] string  `json:"mainServices"`
-}
-
-type MainDiraction struct{
-	Id string `bson:"_id"`
-	Photo string `json:"photo"`
-	Phone string `json:"phone"`
-	Ru LangForDiraction `json:"ru"`
-	En LangForDiraction `json:"en"`
-}
-type DeleteMainDiraction struct{
-	Id string `bson:"_id"`
-	PhotoId string
-	FolderName string `json:"foldername"`
-}
-
-
-
-
-
-
-
-
-
-
-type LangForProject struct{
-	Title string `json:"name"`
-	Description string `json:"description"`
-	Address string `json:"adress"`
-}
-
-type Project struct{
-	Id string `bson:"_id"`
-	Photo string
-	Phone string `json:"phone"`
-	Email string `json:"email"`
-	En LangForProject `json:"en"`
-	Ru LangForProject `json:"ru"`
-}
-type DeleteProject struct{
-	Id string `bson:"_id"`
-	FolderName string `json:"folderName"`
-	PhotoId string `json:"photoid"`
-}
-
-
-
-
-type Time_For_Team struct{
-		Days_Of_Week [] string `json:"days_of_week"`
-		Start_Time string `json:"start_time"`
-		End_Time string `json:"end_time"`
-}
-
-
 type LangForTeam struct{
 	Full_Name string `json:"full_name"`
 	Job_Title string `json:"job_title"`
-	Education [] string `json:"education"`
-	Expirence [] string `json:"expirence"`
+	Education string `json:"education"`
+	Expirence string `json:"expirence"`
+	Place string `json:"place"`
 }
 
 
@@ -226,13 +138,19 @@ type Team struct{
 	Photo string  `json:"photo"`
 
 }
-type DeleteTeam struct{
+
+
+
+type Program struct{
 	Id string `bson:"_id"`
-	FolderName string `json:"folderName"`
-	PhotoId string `json:"photoid"`
+	Photo string `json:"photo"`
+	Ru ProgramLang  `json:"ru"`
+	En ProgramLang  `json:"en"`
 }
-
-
+type ProgramLang struct{
+	Title string `json:"title"`
+	Description string `json:"description"`
+}
 type Services struct{
 	Id string `bson:"_id"`
 	Photo string `json:"photo"`
@@ -240,8 +158,10 @@ type Services struct{
 	En ServiceLang  `json:"en"`
 }
 type ServiceLang struct{
-	Name string `json:"name"`
-	Description string `json:"description"`
+	Title string `json:"name"`
+	Maindescription string `json:"maindescription"`
+	Servisec []string `json:"servisec"`
+	LastDescription string `json:"lastdescription"`
 }
 
 
@@ -251,26 +171,3 @@ type UpdatePassword struct{
 	Code int `json:"code"`
 }
 
-
-type RuReport struct {
-	Title string `json:"title"`
-}
-type EnReport struct {
-	Title string `json:"title"`
-}
-
-
-
-type AddReport struct{
-	Id string `bson:"_id"`
-	Ru RuReport `json:"ru"`
-	En EnReport `json:"en"`
-	File string `json:"file"`
-	Date string `json:"date"`
-}
-
-type DeleteReport struct{
-	Id string `bson:"_id"`
-	FolderName string `json:"folderName"`
-	FileId string `json:"fileId"`
-}

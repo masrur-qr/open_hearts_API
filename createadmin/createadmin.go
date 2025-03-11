@@ -22,7 +22,7 @@ import (
 
 func Createadmin() {
 	client, ctx := mongoconnect.DBConnection()
-	Connections := client.Database(env.Data_Name).Collection("Users")
+	Connections := client.Database(env.Data_Name).Collection("users")
 	// if admin exist not insert
 	found := Connections.FindOne(ctx, bson.M{
 		"permission": "MainAdmin",
@@ -75,25 +75,15 @@ func AdminRegistration(c *gin.Context) {
 				rndName := rand.Intn(10000)
 				ForImage := fmt.Sprintf("image_%v.png", rndName)
 
-				AdminData.Photo = baner.ImageFunc(AdminData.Photo, ForImage, folderName)
+				Photo := baner.ImageFunc(AdminData.Photo, ForImage, folderName)
+				AdminData.Photo=folderName+"/"+Photo
 
 				client, ctx := mongoconnect.DBConnection()
-				var createDB = client.Database(env.Data_Name).Collection("Users")
+				var createDB = client.Database(env.Data_Name).Collection("users")
 				AdminData.Id = primitive.NewObjectID().Hex()
 				Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
-				_, inserterror := createDB.InsertOne(ctx, structs.UserStruct{
-					Id:         AdminData.Id,
-					Phone:      AdminData.Phone,
-					Password:   Hashed,
-					Permission: "Admin",
-					Email:      AdminData.Email,
-					Ru: structs.LangForUser{
-						Name: AdminData.Ru.Name,
-					},
-					En: structs.LangForUser{
-						Name: AdminData.En.Name,
-					},
-				})
+				AdminData.Password=Hashed
+				_, inserterror := createDB.InsertOne(ctx, AdminData)
 				if inserterror != nil {
 					fmt.Printf("inserterror: %v\n", inserterror)
 				} else {
@@ -129,7 +119,7 @@ func UpdateAdmin(c *gin.Context) {
 				Update_Admin.Photo = baner.ImageFunc(Update_Admin.Photo, ForImage, folder_Name)
 
 				client, ctx := mongoconnect.DBConnection()
-				collection := client.Database(env.Data_Name).Collection("Users")
+				collection := client.Database(env.Data_Name).Collection("users")
 
 				Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
 				result := collection.FindOneAndUpdate(
