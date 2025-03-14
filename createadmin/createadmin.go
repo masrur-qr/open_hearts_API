@@ -67,27 +67,36 @@ func AdminRegistration(c *gin.Context) {
 			if Emptyfield {
 				c.JSON(400, err)
 			} else {
-				folderName := "AdminPhoto"
-				FolderError := createimagephoto.CreateFolder(folderName)
-				if FolderError != nil {
-					fmt.Printf("FolderError: %v\n", FolderError)
-				}
-				rndName := rand.Intn(10000)
-				ForImage := fmt.Sprintf("image_%v.png", rndName)
-
-				Photo := baner.ImageFunc(AdminData.Photo, ForImage, folderName)
-				AdminData.Photo=folderName+"/"+Photo
-
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("users")
-				AdminData.Id = primitive.NewObjectID().Hex()
-				Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
-				AdminData.Password=Hashed
-				_, inserterror := createDB.InsertOne(ctx, AdminData)
-				if inserterror != nil {
-					fmt.Printf("inserterror: %v\n", inserterror)
-				} else {
-					c.JSON(200, "succes")
+				findrezult := createDB.FindOne(ctx, bson.M{
+					"email": AdminData.Email,
+				})
+				var Dbdata structs.UserStruct
+				findrezult.Decode(&Dbdata)
+				if Dbdata.Email == "" {
+					folderName := "AdminPhoto"
+					FolderError := createimagephoto.CreateFolder(folderName)
+					if FolderError != nil {
+						fmt.Printf("FolderError: %v\n", FolderError)
+					}
+					rndName := rand.Intn(10000)
+					ForImage := fmt.Sprintf("image_%v.png", rndName)
+
+					Photo := baner.ImageFunc(AdminData.Photo, ForImage, folderName)
+					AdminData.Photo = folderName + "/" + Photo
+
+					AdminData.Id = primitive.NewObjectID().Hex()
+					Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
+					AdminData.Password = Hashed
+					_, inserterror := createDB.InsertOne(ctx, AdminData)
+					if inserterror != nil {
+						fmt.Printf("inserterror: %v\n", inserterror)
+					} else {
+						c.JSON(200, "succes")
+					}
+				}else {
+					c.JSON(400,"error email alrady exsist")
 				}
 			}
 		}
@@ -128,7 +137,7 @@ func UpdateAdmin(c *gin.Context) {
 						{Key: "_id", Value: Update_Admin.Id},
 					},
 					bson.D{
-						{Key:"$set", Value:bson.D{
+						{Key: "$set", Value: bson.D{
 							{Key: "email", Value: Update_Admin.Email},
 							{Key: "phone", Value: Update_Admin.Phone},
 							{Key: "photo", Value: folder_Name + "/" + Update_Admin.Photo},

@@ -44,7 +44,7 @@ func Handlers() {
 
 	r.POST("/add/partner", controlers.AddPartner)
 	r.DELETE("/delete/partner", controlers.DeletePartners) 
-	r.GET("/get/partner", controlers.GetPartners) 
+	r.GET("/get/partners", controlers.GetPartners) 
 
 
 	r.POST("/add/team", controlers.AddTeamMembers) 
@@ -59,7 +59,7 @@ func Handlers() {
 	
 	r.POST("/add/program", controlers.AddProgram)
 	r.DELETE("/delete/program", controlers.DeleteProgram)
-	r.GET("/get/program", controlers.GetPrograms)
+	r.GET("/get/programs", controlers.GetPrograms)
 	
 
 	r.POST("/update/center/statistic", controlers.UpdateCenterStatistic) 

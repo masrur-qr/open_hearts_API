@@ -3,11 +3,9 @@ package controlers
 import (
 	env "docs/app/Env"
 	"docs/app/emptyfieldcheker"
-
 	"docs/app/mongoconnect"
 	"docs/app/returnJwt"
 	"docs/app/structs"
-
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -99,7 +97,6 @@ func UpdateCenterStatistic(c *gin.Context) {
 				} else {
 					c.JSON(200, "Success")
 				}
-
 			}
 		}
 	}
