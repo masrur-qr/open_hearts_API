@@ -179,24 +179,36 @@ func GetPrograms(c *gin.Context) {
 }
 
 func GetAdmins(c *gin.Context) {
-	var Forlist = []structs.UserStruct{}
+	email := c.Request.URL.Query().Get("email")
+	client, ctx := mongoconnect.DBConnection()
+	connect := client.Database(env.Data_Name).Collection("users")
+	findrezult := connect.FindOne(ctx, bson.M{
+		"email": email,
+	})
+	var Dbdata structs.UserStruct
+	findrezult.Decode(&Dbdata)
+	if Dbdata.Id != "" {
+		var Forlist = []structs.UserStruct{}
 
-	connect, ctx := mongoconnect.DBConnection()
-	var createDB = connect.Database(env.Data_Name).Collection("users")
+		connect, ctx := mongoconnect.DBConnection()
+		var createDB = connect.Database(env.Data_Name).Collection("users")
 
-	var singlerezult, singerror = createDB.Find(ctx, bson.M{})
-	if singerror != nil {
-		fmt.Printf("Error: %v\n", singerror)
+		var singlerezult, singerror = createDB.Find(ctx, bson.M{})
+		if singerror != nil {
+			fmt.Printf("Error: %v\n", singerror)
+		}
+
+		for singlerezult.Next(ctx) {
+			var datafromdb structs.UserStruct
+			fmt.Printf("Data from DB: %v\n", datafromdb)
+			singlerezult.Decode(&datafromdb)
+
+			Forlist = append(Forlist, datafromdb)
+		}
+		c.JSON(200, Forlist)
+	}else {
+		c.JSON(400,"error acces is blocked")
 	}
-
-	for singlerezult.Next(ctx) {
-		var datafromdb structs.UserStruct
-		fmt.Printf("Data from DB: %v\n", datafromdb)
-		singlerezult.Decode(&datafromdb)
-
-		Forlist = append(Forlist, datafromdb)
-	}
-	c.JSON(200, Forlist)
 }
 func GetOnePatient(c *gin.Context) {
 	var Forlist = []structs.Patient_story{}
@@ -204,15 +216,14 @@ func GetOnePatient(c *gin.Context) {
 	connect, ctx := mongoconnect.DBConnection()
 	var createDB = connect.Database(env.Data_Name).Collection("patientstory")
 
-	singlerezult := createDB.FindOne(ctx, bson.M{"_id":ids})
+	singlerezult := createDB.FindOne(ctx, bson.M{"_id": ids})
 	var datafromdb structs.Patient_story
 	singlerezult.Decode(&datafromdb)
-	
-	if datafromdb.Id!="" {
+
+	if datafromdb.Id != "" {
 		Forlist = append(Forlist, datafromdb)
 		c.JSON(200, Forlist)
-	}else {
-		c.JSON(400,"User not found")
+	} else {
+		c.JSON(400, "User not found")
 	}
 }
-
