@@ -189,7 +189,6 @@ func GetAdmins(c *gin.Context) {
 	findrezult.Decode(&Dbdata)
 	if Dbdata.Permission == "MainAdmin" {
 		var Forlist = []structs.UserStruct{}
-
 		connect, ctx := mongoconnect.DBConnection()
 		var createDB = connect.Database(env.Data_Name).Collection("users")
 

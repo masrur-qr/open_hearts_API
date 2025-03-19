@@ -63,7 +63,7 @@ func AdminRegistration(c *gin.Context) {
 		} else {
 			var AdminData structs.UserStruct
 			c.ShouldBindJSON(&AdminData)
-			Emptyfield, err := emptyfieldcheker.EmptyField(AdminData, "Id", "Permission")
+			Emptyfield, err := emptyfieldcheker.EmptyField(AdminData, "Id", "Permission","Code")
 			if Emptyfield {
 				c.JSON(400, err)
 			} else {
