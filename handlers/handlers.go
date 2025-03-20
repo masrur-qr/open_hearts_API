@@ -66,7 +66,7 @@ func Handlers() {
 	r.GET("/get/center", controlers.GetCenterNumbers) 
 	
 	
-	
+	r.GET("/read/photo",controlers.ReadFile)
 	r.Run(":2020")
 
 }

@@ -187,9 +187,8 @@ func GetAdmins(c *gin.Context) {
 	})
 	var Dbdata structs.UserStruct
 	findrezult.Decode(&Dbdata)
-	if Dbdata.Id != "" {
+	if Dbdata.Permission == "MainAdmin" {
 		var Forlist = []structs.UserStruct{}
-
 		connect, ctx := mongoconnect.DBConnection()
 		var createDB = connect.Database(env.Data_Name).Collection("users")
 
@@ -225,5 +224,15 @@ func GetOnePatient(c *gin.Context) {
 		c.JSON(200, Forlist)
 	} else {
 		c.JSON(400, "User not found")
+	}
+}
+func ReadFile(c *gin.Context)  {
+	path := c.Request.URL.Query().Get("Path")
+	
+	fmt.Printf("filename: %v\n", path)
+	if path == ""{
+		c.JSON(404,"empty filed")
+	}else {
+		c.File("./Statics/"+path)
 	}
 }
