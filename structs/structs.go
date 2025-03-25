@@ -159,10 +159,8 @@ type Services struct{
 	En ServiceLang  `json:"en"`
 }
 type ServiceLang struct{
-	Title string `json:"name"`
-	Maindescription string `json:"maindescription"`
-	Servisec []string `json:"servisec"`
-	LastDescription string `json:"lastdescription"`
+	Title string `json:"title"`
+	Description string `json:"description"`
 }
 
 
