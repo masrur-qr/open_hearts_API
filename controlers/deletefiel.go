@@ -50,9 +50,8 @@ func DeletePatientStory(c *gin.Context) {
 }
 
 func DeletePartners(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
-
 		c.JSON(404, "Error: No cookie found")
 
 	} else {
@@ -66,7 +65,7 @@ func DeletePartners(c *gin.Context) {
 			var createDB = client.Database(env.Data_Name).Collection("partners")
 			deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
 			var Delete structs.Partner
-			deleterezult.Decode((Delete))
+			deleterezult.Decode(&Delete)
 			if Delete.Id != "" {
 				err := os.RemoveAll("./Statics/" + Delete.Logo)
 				if err != nil {
@@ -82,7 +81,7 @@ func DeletePartners(c *gin.Context) {
 }
 
 func DeleteTeam(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 
 		c.JSON(404, "Error: No cookie found")
@@ -103,7 +102,7 @@ func DeleteTeam(c *gin.Context) {
 				var createDB = client.Database(env.Data_Name).Collection("team")
 				deleterezult := createDB.FindOneAndDelete(ctx, bson.M{"_id": ids})
 				var Delete structs.Team
-				deleterezult.Decode(Delete)
+				deleterezult.Decode(&Delete)
 				if Delete.Id != "" {
 					err := os.RemoveAll("./Statics/" + Delete.Photo)
 					if err != nil {
@@ -120,7 +119,7 @@ func DeleteTeam(c *gin.Context) {
 }
 
 func DeleteServices(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 
 		c.JSON(404, "Error: No cookie found")
@@ -158,7 +157,7 @@ func DeleteServices(c *gin.Context) {
 }
 
 func DeleteProgram(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 
 		c.JSON(404, "Error: No cookie found")
@@ -196,7 +195,7 @@ func DeleteProgram(c *gin.Context) {
 }
 
 func DeleteAdmin(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 		c.JSON(404, "Error: No cookie found")
 	} else {

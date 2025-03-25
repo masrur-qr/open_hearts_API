@@ -63,7 +63,7 @@ func AdminRegistration(c *gin.Context) {
 		} else {
 			var AdminData structs.UserStruct
 			c.ShouldBindJSON(&AdminData)
-			Emptyfield, err := emptyfieldcheker.EmptyField(AdminData, "Id", "Permission","Code")
+			Emptyfield, err := emptyfieldcheker.EmptyField(AdminData, "Id", "Permission", "Code")
 			if Emptyfield {
 				c.JSON(400, err)
 			} else {
@@ -95,8 +95,8 @@ func AdminRegistration(c *gin.Context) {
 					} else {
 						c.JSON(200, "succes")
 					}
-				}else {
-					c.JSON(400,"error email alrady exsist")
+				} else {
+					c.JSON(400, "error email alrady exsist")
 				}
 			}
 		}
@@ -112,9 +112,10 @@ func UpdateAdmin(c *gin.Context) {
 		if SecretKeyData.Permission != "MainAdmin" && SecretKeyData.Permission != "Admin" && isvalid {
 			c.JSON(403, "error")
 		} else {
+
 			var Update_Admin structs.UserStruct
 			c.ShouldBindJSON(&Update_Admin)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission")
+			Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission", "Code")
 			if Emptyfield {
 				c.JSON(400, err)
 			} else {

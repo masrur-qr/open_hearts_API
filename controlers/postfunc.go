@@ -205,7 +205,7 @@ func AddTeamMembers(c *gin.Context) {
 		fmt.Printf("Cookie data: %v\n", cookidata)
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && isvalid {
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" &&  isvalid {
 			c.JSON(404, "Error: Only admins have access")
 		} else {
 
@@ -254,8 +254,7 @@ func AddProgram(c *gin.Context) {
 
 			var Services structs.Program
 			c.ShouldBindJSON(&Services)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id", "Servisec", "LastDescription")
-
+			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id",)
 			if Emptyfield {
 				c.JSON(404, err)
 			} else {

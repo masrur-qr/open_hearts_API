@@ -158,7 +158,7 @@ func GetServices(c *gin.Context) {
 }
 
 func GetPrograms(c *gin.Context) {
-	var Forlist = []structs.Services{}
+	var Forlist = []structs.Program{}
 
 	connect, ctx := mongoconnect.DBConnection()
 	var createDB = connect.Database(env.Data_Name).Collection("programs")
@@ -169,7 +169,7 @@ func GetPrograms(c *gin.Context) {
 	}
 
 	for singlerezult.Next(ctx) {
-		var datafromdb structs.Services
+		var datafromdb structs.Program
 		fmt.Printf("Data from DB: %v\n", datafromdb)
 		singlerezult.Decode(&datafromdb)
 

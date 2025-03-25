@@ -126,13 +126,14 @@ type LangForTeam struct{
 	Job_Title string `json:"job_title"`
 	Education string `json:"education"`
 	Expirence string `json:"expirence"`
-	Place string `json:"place"`
+	
 }
 
 
 
 type Team struct{
 	Id string `bson:"_id"`
+	Place string `json:"place"`
 	Ru LangForTeam `json:"ru"`
 	En LangForTeam `json:"en"`
 	Photo string  `json:"photo"`

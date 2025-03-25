@@ -39,6 +39,7 @@ func Handlers() {
 	r.POST("/add/patient/story", controlers.AddPatientStory) 
 	r.DELETE("/delete/patient/story", controlers.DeletePatientStory) 
 	r.GET("/get/patient/story", controlers.GetPatientStories) 
+	r.GET("/get/one/patient", controlers.GetOnePatient) 
 
 
 
@@ -64,6 +65,7 @@ func Handlers() {
 
 	r.POST("/update/center/statistic", controlers.UpdateCenterStatistic) 
 	r.GET("/get/center", controlers.GetCenterNumbers) 
+
 	
 	
 	r.GET("/read/photo",controlers.ReadFile)
