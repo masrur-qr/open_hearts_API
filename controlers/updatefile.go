@@ -103,7 +103,7 @@ func UpdateCenterStatistic(c *gin.Context) {
 }
 
 func UpdateProjectStatistic(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Name)
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
 		c.JSON(404, "error Not Cookie found")
 	} else {

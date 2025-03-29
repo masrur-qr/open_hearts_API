@@ -3,11 +3,13 @@ package controlers
 import (
 	"docs/app/Env"
 	"docs/app/mongoconnect"
+	returnjwt "docs/app/returnJwt"
 	"docs/app/structs"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetStatistics(c *gin.Context) {
@@ -178,37 +180,6 @@ func GetPrograms(c *gin.Context) {
 	c.JSON(200, Forlist)
 }
 
-func GetAdmins(c *gin.Context) {
-	email := c.Request.URL.Query().Get("email")
-	client, ctx := mongoconnect.DBConnection()
-	connect := client.Database(env.Data_Name).Collection("users")
-	findrezult := connect.FindOne(ctx, bson.M{
-		"email": email,
-	})
-	var Dbdata structs.UserStruct
-	findrezult.Decode(&Dbdata)
-	if Dbdata.Permission == "MainAdmin" {
-		var Forlist = []structs.UserStruct{}
-		connect, ctx := mongoconnect.DBConnection()
-		var createDB = connect.Database(env.Data_Name).Collection("users")
-
-		var singlerezult, singerror = createDB.Find(ctx, bson.M{})
-		if singerror != nil {
-			fmt.Printf("Error: %v\n", singerror)
-		}
-
-		for singlerezult.Next(ctx) {
-			var datafromdb structs.UserStruct
-			fmt.Printf("Data from DB: %v\n", datafromdb)
-			singlerezult.Decode(&datafromdb)
-
-			Forlist = append(Forlist, datafromdb)
-		}
-		c.JSON(200, Forlist)
-	}else {
-		c.JSON(400,"error acces is blocked")
-	}
-}
 func GetOnePatient(c *gin.Context) {
 	var Forlist = []structs.Patient_story{}
 	ids := c.Request.URL.Query().Get("id")
@@ -226,13 +197,74 @@ func GetOnePatient(c *gin.Context) {
 		c.JSON(400, "User not found")
 	}
 }
-func ReadFile(c *gin.Context)  {
+func ReadFile(c *gin.Context) {
 	path := c.Request.URL.Query().Get("Path")
-	
+
 	fmt.Printf("filename: %v\n", path)
-	if path == ""{
-		c.JSON(404,"empty filed")
-	}else {
-		c.File("./Statics/"+path)
+	if path == "" {
+		c.JSON(404, "empty filed")
+	} else {
+		c.File("./Statics/" + path)
+	}
+}
+
+func GetAdmins(c *gin.Context) {
+	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
+	if cookieerror != nil {
+			c.JSON(401, "error: No Cookie found")
+	}
+	SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
+	if isvalid || (SecretKeyData.Permission != "MainAdmin" ) {
+			c.JSON(403, "error: Unauthorized access")
+			return
+	}
+
+	client, ctx := mongoconnect.DBConnection()
+	collection := client.Database(env.Data_Name).Collection("users")
+
+	projection := bson.D{
+			{"password", 0}, 
+	}
+
+	result, err := collection.Find(ctx, bson.D{}, options.Find().SetProjection(projection))
+	if err != nil {
+			fmt.Println("error:", err)
+			c.JSON(500, "Error while retrieving data")
+			return
+	}
+
+	var admins []structs.UserStruct
+	for result.Next(ctx) {
+			var admin structs.UserStruct
+			if err := result.Decode(&admin); err != nil {
+					fmt.Println("error decoding result:", err)
+					continue
+			}
+			admins = append(admins, admin)
+	}
+
+	if err := result.Err(); err != nil {
+			fmt.Println("error iterating over result:", err)
+	}
+
+	c.JSON(200, admins)
+}
+
+
+func GetAdmin(c *gin.Context) {
+	var Forlist = []structs.UserStruct{}
+	ids := c.Request.URL.Query().Get("id")
+	connect, ctx := mongoconnect.DBConnection()
+	var createDB = connect.Database(env.Data_Name).Collection("users")
+
+	singlerezult := createDB.FindOne(ctx, bson.M{"_id": ids})
+	var datafromdb structs.UserStruct
+	singlerezult.Decode(&datafromdb)
+
+	if datafromdb.Id != "" {
+		Forlist = append(Forlist, datafromdb)
+		c.JSON(200, Forlist)
+	} else {
+		c.JSON(400, "User not found")
 	}
 }

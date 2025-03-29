@@ -70,11 +70,11 @@ func AdminRegistration(c *gin.Context) {
 				client, ctx := mongoconnect.DBConnection()
 				var createDB = client.Database(env.Data_Name).Collection("users")
 				findrezult := createDB.FindOne(ctx, bson.M{
-					"email": AdminData.Email,
+					"phone": AdminData.Phone,
 				})
 				var Dbdata structs.UserStruct
 				findrezult.Decode(&Dbdata)
-				if Dbdata.Email == "" {
+				if Dbdata.Email == "" && Dbdata.Phone == "" {
 					folderName := "AdminPhoto"
 					FolderError := createimagephoto.CreateFolder(folderName)
 					if FolderError != nil {
@@ -89,14 +89,27 @@ func AdminRegistration(c *gin.Context) {
 					AdminData.Id = primitive.NewObjectID().Hex()
 					Hashed, _ := hashedpasswod.HashPassword(AdminData.Password)
 					AdminData.Password = Hashed
-					_, inserterror := createDB.InsertOne(ctx, AdminData)
+					_, inserterror := createDB.InsertOne(ctx, structs.UserStruct{
+						Id:         AdminData.Id,
+						Photo:      AdminData.Photo,
+						Phone:      AdminData.Phone,
+						Password:   Hashed,
+						Permission: "Admin",
+						Email:      AdminData.Email,
+						Ru: structs.LangForUser{
+							Name: AdminData.Ru.Name,
+						},
+						En: structs.LangForUser{
+							Name: AdminData.En.Name,
+						},
+					})
 					if inserterror != nil {
 						fmt.Printf("inserterror: %v\n", inserterror)
 					} else {
 						c.JSON(200, "succes")
 					}
 				} else {
-					c.JSON(400, "error email alrady exsist")
+					c.JSON(400, "error Admin alrady exsist")
 				}
 			}
 		}
@@ -106,59 +119,68 @@ func AdminRegistration(c *gin.Context) {
 func UpdateAdmin(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {
-		c.JSON(401, "error Not Cookie found")
-	} else {
-		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "MainAdmin" && SecretKeyData.Permission != "Admin" && isvalid {
-			c.JSON(403, "error")
-		} else {
+		c.JSON(401, "error: No Cookie found")
+		return
+	}
+	SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
+	if isvalid || (SecretKeyData.Permission != "MainAdmin" && SecretKeyData.Permission != "Admin") {
+		c.JSON(403, "error: Unauthorized access")
+		return
+	}
+	var Update_Admin structs.UserStruct
+	if err := c.ShouldBindJSON(&Update_Admin); err != nil {
+		c.JSON(400, "error: Invalid JSON data")
+		return
+	}
+	Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission", "Code")
+	if Emptyfield {
+		c.JSON(400, err)
+		return
+	}
 
-			var Update_Admin structs.UserStruct
-			c.ShouldBindJSON(&Update_Admin)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission", "Code")
-			if Emptyfield {
-				c.JSON(400, err)
-			} else {
-				folder_Name := "AdminPhoto"
-				FolderError := createimagephoto.CreateFolder(folder_Name)
-				if FolderError != nil {
-					fmt.Printf("FolderError: %v\n", FolderError)
-				}
-				rndName := rand.Intn(10000)
-				ForImage := fmt.Sprintf("image_%v.png", rndName)
-				Update_Admin.Photo = baner.ImageFunc(Update_Admin.Photo, ForImage, folder_Name)
+	folderName := "AdminPhoto"
+	FolderError := createimagephoto.CreateFolder(folderName)
+	if FolderError != nil {
+		fmt.Printf("Folder error: %v\n", FolderError)
+	}
+	rndName := rand.Intn(10000)
+	ForImage := fmt.Sprintf("image_%v.png", rndName)
+	Photo := baner.ImageFunc(Update_Admin.Photo, ForImage, folderName)
+	Update_Admin.Photo = folderName + "/" + Photo
 
-				client, ctx := mongoconnect.DBConnection()
-				collection := client.Database(env.Data_Name).Collection("users")
+	client, ctx := mongoconnect.DBConnection()
+	collection := client.Database(env.Data_Name).Collection("users")
 
-				Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
-				result := collection.FindOneAndUpdate(
-					ctx,
-					bson.D{
-						{Key: "_id", Value: Update_Admin.Id},
-					},
-					bson.D{
-						{Key: "$set", Value: bson.D{
-							{Key: "email", Value: Update_Admin.Email},
-							{Key: "phone", Value: Update_Admin.Phone},
-							{Key: "photo", Value: folder_Name + "/" + Update_Admin.Photo},
-							{Key: "password", Value: Hashed},
-							{Key: "ru", Value: Update_Admin.Ru.Name},
-							{Key: "en", Value: Update_Admin.En.Name},
-						}},
-					},
-				)
-				var Dbdata structs.UserStruct
-				result.Decode(&Dbdata)
-				if Dbdata.Photo != "" {
-					deleteeror := os.RemoveAll("./Statics/" + Dbdata.Photo)
-					if deleteeror != nil {
-						fmt.Printf("err: %v\n", deleteeror)
-					}
-				}
 
-				c.JSON(200, "succes")
-			}
+	Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
+
+	result := collection.FindOneAndUpdate(
+		ctx,
+		bson.D{{Key: "_id", Value: Update_Admin.Id}},
+		bson.D{
+			{Key: "$set", Value: bson.D{
+				{Key: "photo", Value: Update_Admin.Photo},
+				{Key: "email", Value: Update_Admin.Email},
+				{Key: "phone", Value: Update_Admin.Phone},
+				{Key: "password", Value: Hashed},
+				{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
+				{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
+			}},
+		},
+	)
+
+
+	var Dbdata structs.UserStruct
+	if err := result.Decode(&Dbdata); err != nil {
+		c.JSON(404, "Admin not found or failed to update")
+		return
+	}
+
+	if Dbdata.Photo != "" {
+		deleteError := os.RemoveAll("./Statics/" + Dbdata.Photo)
+		if deleteError != nil {
+			fmt.Printf("error removing old photo: %v\n", deleteError)
 		}
 	}
+	c.JSON(200,"Succes")
 }

@@ -16,52 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func AddStatistic(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
-	if cookieerror != nil {
-		c.JSON(404, "Error: No cookie found")
-	} else {
-		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
-			c.JSON(404, "Error: Only admins have access to add")
-		} else {
-			client, ctx := mongoconnect.DBConnection()
-			createDB := client.Database(env.Data_Name).Collection("statistic")
-			count, err := createDB.CountDocuments(ctx, bson.M{})
-			if err != nil {
-				fmt.Printf("Error: %v\n", err)
-			}
-			if count >= 4 {
-				c.JSON(400, "You cannot add another statistic")
-			} else {
-				var statistic_shablon structs.AddStatistic
-				c.ShouldBindJSON(&statistic_shablon)
-				Emptyfield, err := emptyfieldcheker.EmptyField(statistic_shablon, "Id")
-				if Emptyfield {
-					c.JSON(404, err)
-				} else {
 
-					statistic_shablon.Id = primitive.NewObjectID().Hex()
-					_, inserterror := createDB.InsertOne(ctx, structs.AddStatistic{
-						Id:       statistic_shablon.Id,
-						Quantity: statistic_shablon.Quantity,
-						Ru: structs.LangForStatistic{
-							Description: statistic_shablon.Ru.Description,
-						},
-						En: structs.LangForStatistic{
-							Description: statistic_shablon.En.Description,
-						},
-					})
-					if inserterror != nil {
-						fmt.Printf("Insert error: %v\n", inserterror)
-					} else {
-						c.JSON(201, "Success")
-					}
-				}
-			}
-		}
-	}
-}
 
 func AddPatientStory(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
@@ -157,45 +112,6 @@ func AddPartner(c *gin.Context) {
 	}
 }
 
-func AddStatisticForProject(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
-	if cookieerror != nil {
-		c.JSON(404, "Error: No cookie found")
-	} else {
-		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
-			c.JSON(404, "Error: Only admins have access to add")
-		} else {
-			var statistic_shablon structs.AddStatisticForCenter
-			c.ShouldBindJSON(&statistic_shablon)
-
-			Emptyfield, err := emptyfieldcheker.EmptyField(statistic_shablon, "Id")
-			if Emptyfield {
-				c.JSON(404, err)
-			} else {
-				client, ctx := mongoconnect.DBConnection()
-
-				var createDB = client.Database(env.Data_Name).Collection("statistic_for_project")
-				count, err := createDB.CountDocuments(ctx, bson.M{})
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-				}
-				if count >= 3 {
-					c.JSON(400, "You cannot add another statistic")
-				} else {
-					statistic_shablon.Id = primitive.NewObjectID().Hex()
-					_, inserterror := createDB.InsertOne(ctx, statistic_shablon)
-					if inserterror != nil {
-						fmt.Printf("Insert error: %v\n", inserterror)
-					} else {
-						c.JSON(201, "Success")
-					}
-				}
-			}
-
-		}
-	}
-}
 
 func AddTeamMembers(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
@@ -205,13 +121,13 @@ func AddTeamMembers(c *gin.Context) {
 		fmt.Printf("Cookie data: %v\n", cookidata)
 	} else {
 		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" &&  isvalid {
+		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
 			c.JSON(404, "Error: Only admins have access")
 		} else {
 
 			var TeamData structs.Team
 			c.ShouldBindJSON(&TeamData)
-			Emptyfield, err := emptyfieldcheker.EmptyField(TeamData, "Id")
+			Emptyfield, err := emptyfieldcheker.EmptyField(TeamData, "Id","Expirence")
 
 			if Emptyfield {
 				c.JSON(400, err)
@@ -254,7 +170,7 @@ func AddProgram(c *gin.Context) {
 
 			var Services structs.Program
 			c.ShouldBindJSON(&Services)
-			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id",)
+			Emptyfield, err := emptyfieldcheker.EmptyField(Services, "Id")
 			if Emptyfield {
 				c.JSON(404, err)
 			} else {
@@ -332,12 +248,59 @@ func AddServices(c *gin.Context) {
 func AddStatisticForCenter() {
 	client, ctx := mongoconnect.DBConnection()
 	Connections := client.Database(env.Data_Name).Collection("center_statistic")
-	for i := 0; i < 3; i++ {
-		ID := primitive.NewObjectID().Hex()
-		Connections.InsertOne(ctx, structs.ChangNumber{
-			Id:       ID,
-			Quantity: 0,
-		})
+	count, err := Connections.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+	if count >= 3 {
+		fmt.Println("too many documents")
+	} else {
+		for i := 0; i < 3; i++ {
+			ID := primitive.NewObjectID().Hex()
+			Connections.InsertOne(ctx, structs.ChangNumber{
+				Id:       ID,
+				Quantity: 0,
+			})
+		}
 	}
 
+}
+
+func AddStatistic() {
+	client, ctx := mongoconnect.DBConnection()
+	Connections := client.Database(env.Data_Name).Collection("statistic")
+	count, err := Connections.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+	if count >= 4 {
+		fmt.Println("too many documents")
+	} else {
+		for i := 0; i < 4; i++ {
+			ID := primitive.NewObjectID().Hex()
+			var AddStatistic structs.AddStatistic
+			AddStatistic.Id = ID
+			Connections.InsertOne(ctx, AddStatistic)
+		}
+
+	}
+}
+func AddStatisticForProject() {
+	client, ctx := mongoconnect.DBConnection()
+	Connections := client.Database(env.Data_Name).Collection("statistic_for_project")
+	count, err := Connections.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+	if count >= 3 {
+		fmt.Println("too many documents")
+	} else {
+		for i := 0; i < 3; i++ {
+			ID := primitive.NewObjectID().Hex()
+			var AddStatistic structs.AddStatisticForCenter
+			AddStatistic.Id = ID
+			Connections.InsertOne(ctx, AddStatistic)
+		}
+
+	}
 }
