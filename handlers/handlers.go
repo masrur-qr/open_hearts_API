@@ -14,6 +14,8 @@ func Handlers() {
 
 	createadmin.Createadmin()
 	controlers.AddStatisticForCenter()
+	controlers.AddStatistic()
+	controlers.AddStatisticForProject()
 
 	r.POST("/login", controlers.Login)
 	r.POST("/send/secret/code", controlers.SendSecretCode) 
@@ -24,14 +26,13 @@ func Handlers() {
 	r.POST("/update/admin", createadmin.UpdateAdmin)
 	r.DELETE("/delete/admin", controlers.DeleteAdmin)
 	r.GET("/get/admin", controlers.GetAdmins)
+	r.GET("/get/one/admin", controlers.GetAdmin)
 
 
-	r.POST("/add/statistic", controlers.AddStatistic)
 	r.POST("/update/statistic", controlers.UpdateStatistic)
 	r.GET("/get/statistic", controlers.GetStatistics)
 
 
-	r.POST("/add/statistic/for/project", controlers.AddStatisticForProject) 
 	r.POST("/update/project/statistic", controlers.UpdateProjectStatistic) 
 	r.GET("/get/project/statistic", controlers.GetStatisticsForProject) 
 
@@ -39,6 +40,7 @@ func Handlers() {
 	r.POST("/add/patient/story", controlers.AddPatientStory) 
 	r.DELETE("/delete/patient/story", controlers.DeletePatientStory) 
 	r.GET("/get/patient/story", controlers.GetPatientStories) 
+	r.GET("/get/one/patient", controlers.GetOnePatient) 
 
 
 
@@ -64,6 +66,7 @@ func Handlers() {
 
 	r.POST("/update/center/statistic", controlers.UpdateCenterStatistic) 
 	r.GET("/get/center", controlers.GetCenterNumbers) 
+
 	
 	
 	r.GET("/read/photo",controlers.ReadFile)

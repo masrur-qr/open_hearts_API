@@ -64,7 +64,7 @@ func SendSecretCode(c *gin.Context) {
 				fmt.Printf("Attempting to delete code with ID: %s\n", id2)
 				Delete(id2)
 			})
-			c.JSON(300, "succes")
+			c.JSON(200, "succes")
 		}
 	} else {
 		c.JSON(404, "error email not found")

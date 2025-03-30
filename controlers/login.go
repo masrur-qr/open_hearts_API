@@ -30,9 +30,7 @@ func Login(c *gin.Context) {
 		})
 		var userdata structs.UserStruct
 		result.Decode(&userdata)
-
 		isValidPass := hashedpasswod.CompareHashPasswords(userdata.Password, LoginTemp.Password)
-
 		key := returnjwt.GenerateToken(userdata.Phone, userdata.Permission, userdata.Id)
 		if userdata.Phone != "" && isValidPass {
 			http.SetCookie(c.Writer, &http.Cookie{
@@ -45,7 +43,16 @@ func Login(c *gin.Context) {
 				HttpOnly: false,
 				SameSite: http.SameSiteLaxMode,
 			})
-			c.JSON(200, "success")
+		admindata:=structs.UserStruct{
+			Id: userdata.Id,
+			Photo: userdata.Photo,
+			Ru: structs.LangForUser{Name: userdata.Ru.Name},
+			En: structs.LangForUser{Name: userdata.En.Name},
+			Email: userdata.Email,
+			Phone: userdata.Phone,
+			Permission: userdata.Permission,
+		}
+			c.JSON(200,admindata)
 		} else {
 			c.JSON(401, "Access is blocked")
 		}
