@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 			Phone: userdata.Phone,
 			Permission: userdata.Permission,
 		}
-			c.JSON(200,admindata)
+		c.JSON(200,admindata)
 		} else {
 			c.JSON(401, "Access is blocked")
 		}

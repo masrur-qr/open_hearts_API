@@ -214,7 +214,7 @@ func GetAdmins(c *gin.Context) {
 			c.JSON(401, "error: No Cookie found")
 	}
 	SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-	if isvalid || (SecretKeyData.Permission != "MainAdmin" ) {
+	if isvalid && (SecretKeyData.Permission != "MainAdmin" ) {
 			c.JSON(403, "error: Unauthorized access")
 			return
 	}
@@ -230,7 +230,6 @@ func GetAdmins(c *gin.Context) {
 	if err != nil {
 			fmt.Println("error:", err)
 			c.JSON(500, "Error while retrieving data")
-			return
 	}
 
 	var admins []structs.UserStruct
@@ -252,7 +251,6 @@ func GetAdmins(c *gin.Context) {
 
 
 func GetAdmin(c *gin.Context) {
-	var Forlist = []structs.UserStruct{}
 	ids := c.Request.URL.Query().Get("id")
 	connect, ctx := mongoconnect.DBConnection()
 	var createDB = connect.Database(env.Data_Name).Collection("users")
@@ -262,8 +260,16 @@ func GetAdmin(c *gin.Context) {
 	singlerezult.Decode(&datafromdb)
 
 	if datafromdb.Id != "" {
-		Forlist = append(Forlist, datafromdb)
-		c.JSON(200, Forlist)
+		admindata:=structs.UserStruct{
+			Id: datafromdb.Id,
+			Photo: datafromdb.Photo,
+			Ru: structs.LangForUser{Name: datafromdb.Ru.Name},
+			En: structs.LangForUser{Name: datafromdb.En.Name},
+			Email: datafromdb.Email,
+			Phone: datafromdb.Phone,
+			Permission: datafromdb.Permission,
+		}
+		c.JSON(200,admindata)
 	} else {
 		c.JSON(400, "User not found")
 	}
