@@ -123,7 +123,7 @@ func UpdateAdmin(c *gin.Context) {
 		return
 	}
 	SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-	if isvalid || (SecretKeyData.Permission != "MainAdmin" && SecretKeyData.Permission != "Admin") {
+	if isvalid && (SecretKeyData.Permission != "MainAdmin" && SecretKeyData.Permission != "Admin") {
 		c.JSON(403, "error: Unauthorized access")
 		return
 	}
@@ -132,55 +132,122 @@ func UpdateAdmin(c *gin.Context) {
 		c.JSON(400, "error: Invalid JSON data")
 		return
 	}
-	Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission", "Code")
+	Emptyfield, err := emptyfieldcheker.EmptyField(Update_Admin, "Permission", "Code", "Photo", "Password")
 	if Emptyfield {
 		c.JSON(400, err)
-		return
-	}
-
-	folderName := "AdminPhoto"
-	FolderError := createimagephoto.CreateFolder(folderName)
-	if FolderError != nil {
-		fmt.Printf("Folder error: %v\n", FolderError)
-	}
-	rndName := rand.Intn(10000)
-	ForImage := fmt.Sprintf("image_%v.png", rndName)
-	Photo := baner.ImageFunc(Update_Admin.Photo, ForImage, folderName)
-	Update_Admin.Photo = folderName + "/" + Photo
-
-	client, ctx := mongoconnect.DBConnection()
-	collection := client.Database(env.Data_Name).Collection("users")
-
-
-	Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
-
-	result := collection.FindOneAndUpdate(
-		ctx,
-		bson.D{{Key: "_id", Value: Update_Admin.Id}},
-		bson.D{
-			{Key: "$set", Value: bson.D{
-				{Key: "photo", Value: Update_Admin.Photo},
-				{Key: "email", Value: Update_Admin.Email},
-				{Key: "phone", Value: Update_Admin.Phone},
-				{Key: "password", Value: Hashed},
-				{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
-				{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
-			}},
-		},
-	)
-
-
-	var Dbdata structs.UserStruct
-	if err := result.Decode(&Dbdata); err != nil {
-		c.JSON(404, "Admin not found or failed to update")
-		return
-	}
-
-	if Dbdata.Photo != "" {
-		deleteError := os.RemoveAll("./Statics/" + Dbdata.Photo)
-		if deleteError != nil {
-			fmt.Printf("error removing old photo: %v\n", deleteError)
+	} else {
+		client, ctx := mongoconnect.DBConnection()
+		collection := client.Database(env.Data_Name).Collection("users")
+		if Update_Admin.Password == "" && Update_Admin.Photo == "" {
+			result := collection.FindOneAndUpdate(
+				ctx,
+				bson.D{{Key: "_id", Value: Update_Admin.Id}},
+				bson.D{
+					{Key: "$set", Value: bson.D{
+						{Key: "email", Value: Update_Admin.Email},
+						{Key: "phone", Value: Update_Admin.Phone},
+						{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
+						{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
+					}},
+				})
+			var Dbdata structs.UserStruct
+			if err := result.Decode(&Dbdata); err != nil {
+				c.JSON(404, "Admin not found or failed to update")
+			} else {
+				c.JSON(200, "Succes")
+			}
+		} else if Update_Admin.Password == "" {
+			folderName := "AdminPhoto"
+			FolderError := createimagephoto.CreateFolder(folderName)
+			if FolderError != nil {
+				fmt.Printf("Folder error: %v\n", FolderError)
+			}
+			rndName := rand.Intn(10000)
+			ForImage := fmt.Sprintf("image_%v.png", rndName)
+			Photo := baner.ImageFunc(Update_Admin.Photo, ForImage, folderName)
+			Update_Admin.Photo = folderName + "/" + Photo
+			result := collection.FindOneAndUpdate(
+				ctx,
+				bson.D{{Key: "_id", Value: Update_Admin.Id}},
+				bson.D{
+					{Key: "$set", Value: bson.D{
+						{Key: "photo", Value: Update_Admin.Photo},
+						{Key: "email", Value: Update_Admin.Email},
+						{Key: "phone", Value: Update_Admin.Phone},
+						{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
+						{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
+					}},
+				},
+			)
+			var Dbdata structs.UserStruct
+			if err := result.Decode(&Dbdata); err != nil {
+				c.JSON(404, "Admin not found or failed to update")
+			} else {
+				c.JSON(200, "Succes")
+			}
+			if Dbdata.Photo != "" {
+				deleteError := os.RemoveAll("./Statics/" + Dbdata.Photo)
+				if deleteError != nil {
+					fmt.Printf("error removing old photo: %v\n", deleteError)
+				}
+			}
+		} else if Update_Admin.Photo == "" {
+			Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
+			result := collection.FindOneAndUpdate(
+				ctx,
+				bson.D{{Key: "_id", Value: Update_Admin.Id}},
+				bson.D{
+					{Key: "$set", Value: bson.D{
+						{Key: "email", Value: Update_Admin.Email},
+						{Key: "password", Value: Hashed},
+						{Key: "phone", Value: Update_Admin.Phone},
+						{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
+						{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
+					}},
+				},
+			)
+			var Dbdata structs.UserStruct
+			if err := result.Decode(&Dbdata); err != nil {
+				c.JSON(404, "Admin not found or failed to update")
+			} else {
+				c.JSON(200, "Succes")
+			}
+		} else if Update_Admin.Photo != "" && Update_Admin.Password != "" {
+			folderName := "AdminPhoto"
+			FolderError := createimagephoto.CreateFolder(folderName)
+			if FolderError != nil {
+				fmt.Printf("Folder error: %v\n", FolderError)
+			}
+			rndName := rand.Intn(10000)
+			ForImage := fmt.Sprintf("image_%v.png", rndName)
+			Photo := baner.ImageFunc(Update_Admin.Photo, ForImage, folderName)
+			Update_Admin.Photo = folderName + "/" + Photo
+			Hashed, _ := hashedpasswod.HashPassword(Update_Admin.Password)
+			result := collection.FindOneAndUpdate(
+				ctx,
+				bson.D{{Key: "_id", Value: Update_Admin.Id}},
+				bson.D{
+					{Key: "$set", Value: bson.D{
+						{Key: "photo", Value: Update_Admin.Photo},
+						{Key: "password", Value: Hashed},
+						{Key: "email", Value: Update_Admin.Email},
+						{Key: "phone", Value: Update_Admin.Phone},
+						{Key: "ru", Value: structs.LangForProjectStatistic{Name: Update_Admin.Ru.Name}},
+						{Key: "en", Value: structs.LangForProjectStatistic{Name: Update_Admin.En.Name}},
+					}},
+				})
+			var Dbdata structs.UserStruct
+			if err := result.Decode(&Dbdata); err != nil {
+				c.JSON(404, "Admin not found or failed to update")
+			} else {
+				c.JSON(200, "Succes")
+			}
+			if Dbdata.Photo != "" {
+				deleteError := os.RemoveAll("./Statics/" + Dbdata.Photo)
+				if deleteError != nil {
+					fmt.Printf("error removing old photo: %v\n", deleteError)
+				}
+			}
 		}
 	}
-	c.JSON(200,"Succes")
 }
