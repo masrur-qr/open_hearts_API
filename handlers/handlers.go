@@ -13,7 +13,7 @@ func Handlers() {
 	r.Use(cors.Cors)
 
 	createadmin.Createadmin()
-	controlers.AddStatisticForCenter()
+
 	controlers.AddStatistic()
 	controlers.AddStatisticForProject()
 
@@ -64,9 +64,7 @@ func Handlers() {
 	r.GET("/get/programs", controlers.GetPrograms)
 	
 
-	r.POST("/update/center/statistic", controlers.UpdateCenterStatistic) 
-	r.GET("/get/center", controlers.GetCenterNumbers) 
-
+	
 	
 	
 	r.GET("/read/photo",controlers.ReadFile)

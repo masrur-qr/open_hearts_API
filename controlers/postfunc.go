@@ -245,26 +245,7 @@ func AddServices(c *gin.Context) {
 	}
 }
 
-func AddStatisticForCenter() {
-	client, ctx := mongoconnect.DBConnection()
-	Connections := client.Database(env.Data_Name).Collection("center_statistic")
-	count, err := Connections.CountDocuments(ctx, bson.M{})
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
-	if count >= 3 {
-		fmt.Println("too many documents")
-	} else {
-		for i := 0; i < 3; i++ {
-			ID := primitive.NewObjectID().Hex()
-			Connections.InsertOne(ctx, structs.ChangNumber{
-				Id:       ID,
-				Quantity: 0,
-			})
-		}
-	}
 
-}
 
 func AddStatistic() {
 	client, ctx := mongoconnect.DBConnection()

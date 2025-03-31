@@ -60,48 +60,6 @@ func UpdateStatistic(c *gin.Context) {
 	}
 
 }
-func UpdateCenterStatistic(c *gin.Context) {
-	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
-	if cookieerror != nil {
-		c.JSON(404, "error Not Cookie found")
-	} else {
-		SecretKeyData, isvalid := returnjwt.Validate(cookidata.Value)
-		if SecretKeyData.Permission != "Admin" && SecretKeyData.Permission != "MainAdmin" && isvalid {
-			c.JSON(404, "error")
-		} else {
-			var NewQuontity structs.ChangNumber
-			c.ShouldBindJSON(&NewQuontity)
-
-			Emptyfield, err := emptyfieldcheker.EmptyField(NewQuontity, "Id")
-			if Emptyfield {
-				c.JSON(404, err)
-			} else {
-
-				client, ctx := mongoconnect.DBConnection()
-				Connections := client.Database(env.Data_Name).Collection("center_statistic")
-				result := Connections.FindOneAndUpdate(
-					ctx,
-					bson.D{
-						{Key: "_id", Value: NewQuontity.Id},
-					},
-					bson.D{
-						{Key: "$set", Value: bson.D{
-							{Key: "quantity", Value: NewQuontity.Quantity},
-						}},
-					},
-				)
-				var Dbdata structs.ChangNumber
-				result.Decode(&Dbdata)
-				if Dbdata.Id == "" {
-					c.JSON(400, "statistic not founded")
-				} else {
-					c.JSON(200, "Success")
-				}
-			}
-		}
-	}
-}
-
 func UpdateProjectStatistic(c *gin.Context) {
 	var cookidata, cookieerror = c.Request.Cookie(env.Data_Cockie)
 	if cookieerror != nil {

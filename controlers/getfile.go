@@ -117,26 +117,6 @@ func GetTeam(c *gin.Context) {
 	c.JSON(200, Forlist)
 }
 
-func GetCenterNumbers(c *gin.Context) {
-	var Forlist = []structs.ChangNumber{}
-
-	connect, ctx := mongoconnect.DBConnection()
-	var createDB = connect.Database(env.Data_Name).Collection("center_statistic")
-
-	var singlerezult, singerror = createDB.Find(ctx, bson.M{})
-	if singerror != nil {
-		fmt.Printf("Error: %v\n", singerror)
-	}
-
-	for singlerezult.Next(ctx) {
-		var datafromdb structs.ChangNumber
-		fmt.Printf("Data from DB: %v\n", datafromdb)
-		singlerezult.Decode(&datafromdb)
-
-		Forlist = append(Forlist, datafromdb)
-	}
-	c.JSON(200, Forlist)
-}
 
 func GetServices(c *gin.Context) {
 	var Forlist = []structs.Services{}
